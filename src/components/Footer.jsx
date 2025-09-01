@@ -1,7 +1,10 @@
-import React from 'react'
 import { motion } from 'framer-motion'
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const Footer = () => {
+  const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -44,9 +47,17 @@ const Footer = () => {
     }
   };
 
+   const handleNavClick = (id) => {
+  if (location.pathname === '/dashboard') {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    navigate('/dashboard', { state: { scrollToId: id } });
+  }
+  setIsMenuOpen(false);
+};
+
   return (
     <footer className="bg-gray-900 text-white relative overflow-hidden">
-      {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20"></div>
         <motion.div
@@ -84,7 +95,6 @@ const Footer = () => {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          {/* Logo and Description */}
           <div className="col-span-1 md:col-span-2">
             <motion.div
               className="mb-6"
@@ -136,18 +146,15 @@ const Footer = () => {
               ))}
             </motion.div>
           </div>
-
-          {/* Links Section (Quick Links + Support) */}
           <motion.div className="grid grid-cols-2 gap-8 md:col-span-2" variants={itemVariants}>
-            {/* Quick Links */}
             <div>
               <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
               <ul className="space-y-3">
                 {[
-                  { href: "#introduction", label: "Introduction" },
-                  { href: "#how-it-works", label: "How It Works" },
-                  { href: "#faqs", label: "FAQs" },
-                  { href: "#", label: "Download App" }
+                  { id: "introduction", label: "Introduction" },
+                  { id: "how-it-works", label: "How It Works" },
+                  { id: "faqs", label: "FAQs" },
+                  { id: "download", label: "Download App" }
                 ].map((link, index) => (
                   <li key={index}>
                     <motion.a
@@ -155,6 +162,7 @@ const Footer = () => {
                       className="group text-gray-400 hover:text-white transition-all duration-300 flex items-center gap-2"
                       variants={linkVariants}
                       whileHover="hover"
+                      onClick={() => handleNavClick(link.id)}
                     >
                       <motion.span
                         className="w-1 h-1 bg-purple-500 rounded-full"
@@ -167,14 +175,13 @@ const Footer = () => {
                 ))}
               </ul>
             </div>
-            {/* Support */}
             <div>
               <h4 className="text-lg font-semibold mb-4 text-white">Support</h4>
               <ul className="space-y-3">
                 {[
-                  { href: "/contact-us", label: "Contact Us" },
-                  { href: "/privacy-policy", label: "Privacy Policy" },
-                  { href: "/terms-of-service", label: "Terms of Service" }
+                  { href: "contact-us", label: "Contact Us" },
+                  { href: "privacy-policy", label: "Privacy Policy" },
+                  { href: "terms-of-service", label: "Terms of Service" }
                 ].map((link, index) => (
                   <li key={index}>
                     <motion.a
@@ -182,6 +189,7 @@ const Footer = () => {
                       className="group text-gray-400 hover:text-white transition-all duration-300 flex items-center gap-2"
                       variants={linkVariants}
                       whileHover="hover"
+                      onClick={() => handleNavClick(link.id)}
                     >
                       <motion.span
                         className="w-1.5 h-1.5 bg-pink-500 rounded-full"
@@ -196,7 +204,6 @@ const Footer = () => {
             </div>
           </motion.div>
         </motion.div>
-        {/* Bottom Section */}
         <motion.div
           className="border-t border-gray-800 mt-12 pt-8"
           initial={{ opacity: 0, y: 20 }}

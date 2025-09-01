@@ -3,9 +3,24 @@ import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
 import ContactUs from "../pages/conatctUs";
+import SignIn from "../pages/auth/signIn";
+import SignUp from "../pages/auth/signUp";
+import ForgotPassword from "../pages/auth/forgotPassword";
 export const routes = createBrowserRouter([
     {
-        path: "/",
+        path:"/",
+        element:<SignIn/>
+    },
+    {
+        path:"/sign-up",
+        element:<SignUp/>
+    },
+     {
+        path:"/forgot-password",
+        element:<ForgotPassword/>
+    },
+    {
+        path: "/dashboard",
         element:  <LandingPage/>,
     },
     {
