@@ -1,13 +1,39 @@
 import Header from "../components/Header"
 import Footer from "../components/Footer"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import FaqPage from "./faqPage"
+import { useLocation } from "react-router-dom";
 
 const LandingPage = () => {
     const [activeFaq, setActiveFaq] = useState(null);
     const { scrollY } = useScroll();
     const y = useTransform(scrollY, [0, 300], [0, -100]);
+
+    const refServices = useRef < HTMLElement | null > (null);
+    const refDomains = useRef < HTMLElement | null > (null);
+
+    const location = useLocation();
+
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const scrollTo = params.get("scroll");
+
+        if (scrollTo === "services") {
+            refServices.current?.scrollIntoView({ behavior: "smooth" });
+        } else if (scrollTo === "domains") {
+            refDomains.current?.scrollIntoView({ behavior: "smooth" });
+        }
+        else return
+    }, [location.search]);
+
+    const handleClick = () => {
+        if (type === "services") {
+            refServices.current?.scrollIntoView({ behavior: "smooth" });
+        } else if (type === "domains") {
+            refDomains.current?.scrollIntoView({ behavior: "smooth" });
+        }
+    };
 
     const toggleFaq = (index) => {
         setActiveFaq(activeFaq === index ? null : index);
@@ -159,9 +185,7 @@ const LandingPage = () => {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-blue-950 to-slate-900 overflow-x-hidden">
-            <Header />
-
-            {/* Floating Background Elements */}
+            <Header handleClick={handleClick} />
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
                 <motion.div
                     className="absolute top-20 left-10 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20"
@@ -182,7 +206,6 @@ const LandingPage = () => {
                 />
             </div>
 
-            {/* Hero Section */}
             <section className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <motion.div
@@ -198,12 +221,11 @@ const LandingPage = () => {
                         animate="visible"
                     >
                         <motion.h1
-                            className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
+                            className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight gradient"
                             variants={itemVariants}
                         >
                             Your Moments<br />
                             <motion.span
-                                className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500"
                                 animate={{
                                     backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
                                 }}
@@ -235,7 +257,6 @@ const LandingPage = () => {
                 </motion.div>
             </section>
 
-            {/* Introduction Section */}
             <section id="introduction" className="py-10 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white relative scroll-mt-24">
                 <div className="max-w-6xl mx-auto">
                     <motion.div
@@ -355,7 +376,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* How It Works Section */}
             <section id="how-it-works" className="py-10 sm:py-24 px-4 sm:px-6 lg:px-8 bg-white relative scroll-mt-24">
                 <div className="max-w-4xl mx-auto">
                     <motion.div
@@ -381,7 +401,6 @@ const LandingPage = () => {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6, delay: index * 0.2 }}
                             >
-                                {/* Number Badge */}
                                 <div className="absolute -left-9 top-1 w-8 h-8 rounded-full bg-pink-500 text-white font-bold text-sm flex items-center justify-center shadow-md">
                                     {index + 1}
                                 </div>
@@ -403,7 +422,6 @@ const LandingPage = () => {
                 </div>
             </section>
 
-            {/* FAQs Section */}
             <section id="faqs" className="py-10 sm:py-20 px-4 sm:px-6 lg:px-8 bg-white scroll-mt-24">
                 <div className="max-w-4xl mx-auto">
                     <motion.div
