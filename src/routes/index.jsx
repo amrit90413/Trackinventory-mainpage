@@ -9,7 +9,7 @@ import ForgotPassword from "../pages/auth/forgotPassword";
 export const routes = createBrowserRouter([
     {
         path:"/",
-        element:<SignIn/>
+        element:<LandingPage/>
     },
     {
         path:"/sign-up",

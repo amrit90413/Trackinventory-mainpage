@@ -149,7 +149,7 @@ const Footer = () => {
           <motion.div className="grid grid-cols-2 gap-8 md:col-span-2" variants={itemVariants}>
             <div>
               <h4 className="text-lg font-semibold mb-4 text-white">Quick Links</h4>
-              <ul className="space-y-3">
+              <ul className="space-y-3 cursor-pointer">
                 {[
                   { id: "introduction", label: "Introduction" },
                   { id: "how-it-works", label: "How It Works" },
