@@ -82,7 +82,7 @@ const Header = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto px-4 pt-4 pb-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:pt-4 sm:pb-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <motion.h1
             className={`text-3xl font-bold bg-clip-text text-transparent cursor-pointer ${gradientClass}`}

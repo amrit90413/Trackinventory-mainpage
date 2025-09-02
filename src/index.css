@@ -16,7 +16,6 @@ a:hover {
   color: #535bf2;
 }
 
-/* Remove default button styles to use Tailwind classes */
 button {
   border: none;
   background: none;
@@ -46,7 +45,6 @@ button {
   @apply text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }

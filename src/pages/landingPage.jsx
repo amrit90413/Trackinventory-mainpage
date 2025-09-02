@@ -54,78 +54,70 @@ const LandingPage = () => {
     const faqs = [
         {
             question: "What is Track Inventory?",
-            answer: "Track Inventory is a student engagement app that rewards you for going to school sports and arts events, taking pics, and showing school spirit."
-        },
-        {
-            question: "How do I earn points?",
-            answer: "You earn points by uploading photos and videos from events and unlocking streaks to boost your rewards!"
-        },
-        {
-            question: "What can I redeem points for?",
-            answer: "Points can be redeemed for school-branded merch like shirts, sweatpants, shorts, and other gear - all free or discounted, just by showing up and participating."
+            answer: "Track Inventory is a smart inventory management solution that helps you to easily record, monitor, and control the sales and stock of both new and used products."
         },
         {
             question: "Who can use Track Inventory?",
-            answer: "Currently, it's for high school students at participating schools. If your school isn't involved yet, let us know and we will work to bring this transformative experience to your campus."
-        },
-        {
-            question: "What kind of photos should I upload?",
-            answer: "Anything fun and appropriate from the event - action shots, crowd hype, halftime moments, team support, etc. Just keep it respectful and school-friendly."
+            answer: "Track Inventory can be used by shopkeepers, warehouse managers, and retailers to efficiently manage and control their stock."
         },
         {
             question: "How is content moderated?",
-            answer: "All uploads are reviewed by your school's admin team or event moderators. Inappropriate or off-topic content may be removed and is subject to disciplinary action by the terms of your administration."
-        },
-        {
-            question: "Can I see other students' posts?",
-            answer: "Yes! There's a media feed where you can scroll through pics and videos from schools across your city and like your favorites."
+            answer: "Content is moderated through automated checks and manual reviews to ensure it is safe, accurate, and free from harmful or inappropriate material."
         },
         {
             question: "Does it cost anything to use?",
-            answer: "Nope, Track Inventory is totally free to use. Just show up, participate, and start racking up points."
+            answer: "Track Inventory is designed to be affordable, with flexible plans that suit different business needs, and even offers a free option to get started."
         },
         {
             question: "Do I need an account to use the app?",
-            answer: "Yes, you'll need to sign up with your school email to track your points and redeem rewards."
+            answer: "Yes, you'll need to sign up with your email to track and maintain your records."
+        }, {
+            question: "Can I track both new and used products?",
+            answer: "Yes, Track Inventory allows you to manage sales and stock of both new and used products seamlessly."
         },
         {
-            question: "How do I redeem rewards?",
-            answer: "Once you've earned enough points, just head to the \"Store\" page and unlock your reward. You'll get instructions on how and when to pick it up at school."
+            question: "Is my data safe?",
+            answer: "Yes, your data is securely stored with encryption to keep your business information protected."
         },
         {
-            question: "What if I forget to check in at an event?",
-            answer: "No worries, you will still receive points, but remember, marking your attendance boosts engagement for everyone."
+            question: "Can I access Track Inventory on mobile?",
+            answer: "Yes, Track Inventory works across devices so you can manage your stock anytime, anywhere."
         },
         {
-            question: "Can I report something inappropriate?",
-            answer: "Yep, you can flag any post you think breaks the guidelines, and our team or your school admins will review it."
+            question: "Does Track Inventory support multiple users?",
+            answer: "Yes, you can add team members and manage permissions to collaborate on inventory management."
+        },
+        {
+            question: "Can I export reports?",
+            answer: "Yes, Track Inventory lets you generate and export sales and stock reports for better insights."
         }
+
     ];
 
     const howItWorksSteps = [
         {
-            title: "Capture",
-            description: "Show out at events and capture the moments that matter.",
+            title: "Create account",
+            description: "To get started, users need to create an account by filling in the required information.",
             icon: "📸"
         },
         {
-            title: "Upload",
-            description: "Post your clips and Fliks to climb the leaderboard.",
+            title: "Business details",
+            description: "Enter your business information such as name, type and other details to set up your profile.",
             icon: "⬆️"
         },
         {
             title: "Engage",
-            description: "Interact and view content from fans and schools across your city.",
+            description: "Engage with the platform by interacting and viewing relevant content.",
             icon: "💬"
         },
         {
-            title: "Earn Rewards",
-            description: "Rack up points and unlock limited time clothing drops.",
+            title: "Download our app",
+            description: "Download our app to manage your inventory anytime, anywhere with ease.",
             icon: "🏆"
         },
         {
-            title: "Redeem",
-            description: "Use your points to claim exclusive merchandise and sportswear.",
+            title: "Trial session",
+            description: "Start a free trial session to explore all features.",
             icon: "🎁"
         }
     ];
@@ -147,25 +139,6 @@ const LandingPage = () => {
             y: 0,
             transition: {
                 duration: 0.5
-            }
-        }
-    };
-
-    const cardVariants = {
-        hidden: { opacity: 0, y: 50 },
-        visible: {
-            opacity: 1,
-            y: 0,
-            transition: {
-                duration: 0.6,
-                ease: "easeOut"
-            }
-        },
-        hover: {
-            y: -10,
-            transition: {
-                duration: 0.3,
-                ease: "easeInOut"
             }
         }
     };
@@ -238,12 +211,6 @@ const LandingPage = () => {
                                 Live Here
                             </motion.span>
                         </motion.h1>
-                        <motion.p
-                            className="text-xl sm:text-2xl mb-8 text-gray-300"
-                            variants={itemVariants}
-                        >
-                            To access shady side events and sports
-                        </motion.p>
                     </motion.div>
 
                     <motion.div
@@ -270,7 +237,7 @@ const LandingPage = () => {
                             Introduction to Track Inventory
                         </h2>
                         <p className="text-base sm:text-lg text-gray-600 mb-4 sm:mb-8">
-                            Where Every Game is a Story.
+                            Smarter way to Inventory Management
                         </p>
                     </motion.div>
 
@@ -299,11 +266,8 @@ const LandingPage = () => {
                                 </motion.span>
                             </h3>
                             <p className="text-base sm:text-lg text-gray-700 leading-relaxed mb-6 sm:mb-8">
-                                Track Inventory is your all-access pass to the most exciting moments in
-                                high school sports and arts. Snap pics, share highlights, and earn
-                                points for showing off your school spirit. Connect and compete with
-                                friends, support your school, and unlock exclusive gear throughout
-                                the year.
+                                We are here to serve you with the best solution in the market built to solve the everyday challenges that shopkeepers face in managing their business.Track Inventory provides the simplest way to record and monitor sales and purchases of both new and used products.
+                                With Track Inventory you gain complete control over your stock. Whether you manage a small shop, a warehouse, or retail operations
                             </p>
                             <motion.button
                                 className="group bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-300" onClick={() => window.location.href = "/contact-us"}
@@ -345,9 +309,9 @@ const LandingPage = () => {
                                 <div className="bg-white rounded-2xl p-6 shadow-xl">
                                     <div className="space-y-4">
                                         {[
-                                            { icon: "📱", title: "Capture Moments", desc: "Share your school spirit" },
-                                            { icon: "🏆", title: "Earn Points", desc: "Rack up rewards" },
-                                            { icon: "🎁", title: "Redeem Rewards", desc: "Get exclusive merch" },
+                                            { icon: "📱", title: "Real-Time Inventory Tracking", desc: "Track record" },
+                                            { icon: "🏆", title: "Supplier & Purchase Order Management", desc: "Order management" },
+                                            { icon: "🎁", title: "	Supplier & Purchase Order Management", desc: "Easy to manage" },
                                         ].map((item, index) => (
                                             <motion.div
                                                 key={index}
