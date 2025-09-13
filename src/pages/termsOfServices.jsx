@@ -88,9 +88,9 @@ const TermsOfServices = () => {
 									duration: 1,
 								}}
 							>
-							<h1 className="text-bold text-white text-4xl mb-8 transition-all duration-700 hover:text-indigo-400 hover:tracking-widest">
-								TERMS OF SERVICE
-							</h1>
+								<h1 className="text-bold text-white text-4xl mb-8 transition-all duration-700 hover:text-indigo-400 hover:tracking-widest">
+									TERMS OF SERVICE
+								</h1>
 							</motion.h1>
 							{/* Content Section */}
 							<motion.div
@@ -238,12 +238,22 @@ const TermsOfServices = () => {
 										</span>
 										Contact Us
 									</motion.h2>
-									<motion.p variants={fadeInUp} className="text-gray-200 leading-relaxed text-sm sm:text-base md:text-lg">
-										Questions about these Terms? Contact us at{" "}
-										<span className="font-bold text-white bg-gradient-to-r from-indigo-400 to-blue-400 bg-clip-text text-transparent">
-											support@smartzone.app
-										</span>
+									<motion.p
+										variants={fadeInUp}
+										className="text-gray-200 leading-relaxed text-sm sm:text-base md:text-lg"
+									>
+										Questions about these Terms? Contact us at
+										<motion.span
+											className="ml-0 sm:ml-4 font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent text-base sm:text-[25px] inline-block"
+											whileHover={{ scale: 1.05 }}
+											whileTap={{ scale: 0.95 }}
+											transition={{ type: "spring", stiffness: 300 }}
+										>
+											SMARTSTOCK33@GMAIL.COM
+										</motion.span>
+
 									</motion.p>
+
 								</motion.div>
 							</motion.div>
 						</motion.div>

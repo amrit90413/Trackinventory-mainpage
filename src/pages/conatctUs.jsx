@@ -19,10 +19,11 @@ export default function ContactUs() {
     return (
         <>
             <Header />
+            <section id = "contact-us">
             <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 pt-32 sm:pt-40 pb-24 px-4 sm:px-8 lg:px-16">
-                <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center gap-12">
-                    <div className="text-white max-w-md text-center md:text-left">
-                        <h2 className="text-4xl sm:text-5xl font-bold mb-3 sm:mb-6">
+                <div className="w-full max-w-6xl mx-auto flex md:flex-row items-start md:items-center">
+                    <div className="text-white text-center">
+                        <h2 className="text-4xl sm:text-5xl font-bold mb-3 sm:mb-6 text-center">
                             Let’s Get in Touch
                         </h2>
                         <p className="text-[14px] sm:text-lg text-gray-300 leading-relaxed">
@@ -30,7 +31,7 @@ export default function ContactUs() {
                             pricing, or anything else our team is ready to help.
                         </p>
                     </div>
-                    <div className="bg-white w-full md:w-1/2 p-6 sm:p-8 rounded-2xl shadow-2xl">
+                    {/* <div className="bg-white w-full md:w-1/2 p-6 sm:p-8 rounded-2xl shadow-2xl">
                         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -81,7 +82,6 @@ export default function ContactUs() {
                                 )}
                             </div>
 
-                            {/* Message */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Message
@@ -94,7 +94,6 @@ export default function ContactUs() {
                                 />
                             </div>
 
-                            {/* Submit */}
                             <button
                                 type="submit"
                                 className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-3 rounded-md hover:from-pink-600 hover:to-purple-700 transition-all"
@@ -102,9 +101,10 @@ export default function ContactUs() {
                                 Send Message
                             </button>
                         </form>
-                    </div>
+                    </div> */}
                 </div>
             </div>
+            </section>
             <Footer />
         </>
     );

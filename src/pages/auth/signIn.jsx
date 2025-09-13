@@ -1,4 +1,5 @@
 import { Button } from "@mui/material";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
@@ -13,10 +14,30 @@ const SignIn = () => {
 
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
-    alert("Signed in successfully!");
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      const response = await axios.post("http://34.131.208.31:7001/api/User/Login", {
+        email: data.email,
+        password: data.password,
+        source: 1, // required by your API
+      }, {
+        headers: {
+          "Content-Type": "application/json-patch+json", // as per Swagger
+        },
+      });
+      console.log("Login response:", response.data);
+      // Save token or user data if provided in response
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      alert("Signed in successfully!");
+      navigate("/dashboard");
+    }
+    catch (error) {
+      console.error("Login error:", error);
+      alert(error.response?.data?.message || "Login failed. Please try again.");
+    }
+    // reset();
   };
 
   return (
@@ -66,14 +87,14 @@ const SignIn = () => {
             )}
           </div>
 
-           <div className="text-right mt-2">
-              <Link
-                className="text-sm text-purple-600 font-medium hover:underline"
-                onClick={() => navigate("/forgot-password")}
-              >
-                Forgot Password?
-              </Link>
-            </div>
+          <div className="text-right mt-2">
+            <Link
+              className="text-sm text-purple-600 font-medium hover:underline"
+              onClick={() => navigate("/forgot-password")}
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
           <div className="flex flex-col items-center space-y-3 pt-1">
             <Button

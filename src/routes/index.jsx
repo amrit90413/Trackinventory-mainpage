@@ -6,33 +6,38 @@ import ContactUs from "../pages/conatctUs";
 import SignIn from "../pages/auth/signIn";
 import SignUp from "../pages/auth/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
+import OtpVerify from "../pages/auth/otpVerify";
 export const routes = createBrowserRouter([
     {
-        path:"/",
-        element:<LandingPage/>
+        path: "/",
+        element: <LandingPage />
     },
     {
-        path:"/sign-up",
-        element:<SignUp/>
+        path: "/sign-up",
+        element: <SignUp />
     },
-     {
-        path:"/forgot-password",
-        element:<ForgotPassword/>
+    {
+        path: "/otp-verify",
+        element:<OtpVerify/>
+    },
+    {
+        path: "/forgot-password",
+        element: <ForgotPassword />
     },
     {
         path: "/dashboard",
-        element:  <LandingPage/>,
+        element: <LandingPage />,
     },
     {
         path: "/terms-of-service",
-        element: <TermsOfServices/>,
+        element: <TermsOfServices />,
     },
     {
         path: "/privacy-policy",
-        element: <PrivacyPolicy/>,
+        element: <PrivacyPolicy />,
     },
-    {
-        path:"/contact-us",
-        element:<ContactUs/>
-    }
+    // {
+    //     path: "/contact-us",
+    //     element: <ContactUs />
+    // }
 ]);

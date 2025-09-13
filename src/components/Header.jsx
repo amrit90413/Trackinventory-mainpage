@@ -100,9 +100,9 @@ const Header = () => {
             {navItems.map((item, index) => <NavLink key={index} item={item} index={index} />)}
           </nav>
 
-          <div className="hidden md:flex items-center">
+          {/* <div className="hidden md:flex items-center">
             <CTAButton />
-          </div>
+          </div> */}
           <div className="md:hidden">
             <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
               <div className="w-6 h-6 flex flex-col justify-center items-center">
@@ -124,7 +124,7 @@ const Header = () => {
             >
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200/50">
                 {navItems.map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
-                <div className="pt-4"><CTAButton mobile /></div>
+                <div className="pt-4"></div>
               </div>
             </motion.div>
           )}

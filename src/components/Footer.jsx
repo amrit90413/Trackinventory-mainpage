@@ -47,14 +47,14 @@ const Footer = () => {
     }
   };
 
-   const handleNavClick = (id) => {
-  if (location.pathname === '/dashboard') {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  } else {
-    navigate('/dashboard', { state: { scrollToId: id } });
-  }
-  setIsMenuOpen(false);
-};
+  const handleNavClick = (id) => {
+    if (location.pathname === '/dashboard') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/dashboard', { state: { scrollToId: id } });
+    }
+    setIsMenuOpen(false);
+  };
 
   return (
     <footer className="bg-gray-900 text-white relative overflow-hidden">
@@ -179,17 +179,13 @@ const Footer = () => {
               <h4 className="text-lg font-semibold mb-4 text-white">Support</h4>
               <ul className="space-y-3">
                 {[
-                  { href: "contact-us", label: "Contact Us" },
-                  { href: "privacy-policy", label: "Privacy Policy" },
-                  { href: "terms-of-service", label: "Terms of Service" }
-                ].map((link, index) => (
-                  <li key={index}>
-                    <motion.a
-                      href={link.href}
-                      className="group text-gray-400 hover:text-white transition-all duration-300 flex items-center gap-2"
-                      variants={linkVariants}
-                      whileHover="hover"
-                      onClick={() => handleNavClick(link.id)}
+                  { path: "/privacy-policy", label: "Privacy Policy" },
+                  { path: "/terms-of-service", label: "Terms of Service" },
+                ].map((link) => (
+                  <li key={link.path}>
+                    <span
+                      className="flex items-center justify-start gap-2 text-gray-400 hover:text-white transition-all duration-300 cursor-pointer"
+                      onClick={() => navigate(link.path)}
                     >
                       <motion.span
                         className="w-1.5 h-1.5 bg-pink-500 rounded-full"
@@ -197,12 +193,68 @@ const Footer = () => {
                         transition={{ type: "spring", stiffness: 300 }}
                       />
                       {link.label}
-                    </motion.a>
+                    </span>
                   </li>
                 ))}
               </ul>
             </div>
           </motion.div>
+        </motion.div>
+        <motion.div
+          className="mt-8 text-left space-y-3" 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.3 }}
+        >
+          {/* Phone */}
+          <motion.a
+            href="tel:7710373130"
+            className="flex items-center gap-3 text-gray-300 hover:text-white transition-all duration-300"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" 
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 5a2 2 0 012-2h2.28a1 1 0 01.94.66l1.38 3.7a1 1 0 01-.27 1.1l-1.7 1.7a16 16 0 006.58 6.58l1.7-1.7a1 1 0 011.1-.27l3.7 1.38a1 1 0 01.66.94V19a2 2 0 01-2 2h-1C10.61 21 3 13.39 3 5z"
+              />
+            </svg>
+            <span className="text-sm sm:text-base font-medium">
+              7710373130
+            </span>
+          </motion.a>
+
+          {/* Email */}
+          <motion.a
+            href="mailto:SMARTSTOCK33@GMAIL.COM"
+            className="flex items-center gap-3 text-gray-300 hover:text-white transition-all duration-300"
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-pink-400"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path d="M2.25 6.75A2.25 2.25 0 014.5 4.5h15a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-15A2.25 2.25 0 012.25 17.25V6.75zm1.72-.53l7.28 5.33 7.28-5.33H3.97z" />
+            </svg>
+            <motion.span
+              className="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              SMARTSTOCK33@GMAIL.COM
+            </motion.span>
+          </motion.a>
         </motion.div>
         <motion.div
           className="border-t border-gray-800 mt-12 pt-8"
@@ -217,13 +269,13 @@ const Footer = () => {
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               {[
-                { href: "/terms-of-service", label: "Terms of Service" },
-                { href: "/privacy-policy", label: "Privacy Policy" }
+                { path: "/terms-of-service", label: "Terms of Service" },
+                { path: "/privacy-policy", label: "Privacy Policy" }
               ].map((link, index) => (
                 <motion.a
                   key={index}
-                  href={link.href}
-                  className="text-gray-400 hover:text-white text-sm transition-all duration-300"
+                  onClick={() => navigate(link.path)}
+                  className="text-gray-400 hover:text-white text-sm transition-all duration-300 cursor-pointer"
                   whileHover={{ scale: 1.05 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
