@@ -16,7 +16,7 @@ const SignIn = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axios.post("http://34.131.208.31:7001/api/User/Login", {
+      const response = await axios.post("https://trackinventory.ddns.net/api/User/Login", {
         email: data.email,
         password: data.password,
         source: 2,

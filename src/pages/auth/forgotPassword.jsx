@@ -18,7 +18,7 @@ const ForgotPassword = () => {
       console.log("Sending OTP Payload:", payload);
 
       await axios.post(
-        "http://34.131.208.31:7001/api/User/ForgotPassword",
+        "https://trackinventory.ddns.net/api/User/ForgotPassword",
         payload,
         { headers: { "Content-Type": "application/json-patch+json" } }
       );
@@ -43,7 +43,7 @@ const ForgotPassword = () => {
       console.log("Verify OTP Payload:", payload);
 
       await axios.post(
-        "http://34.131.208.31:7001/api/OTP/VerifyOTP",
+        "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -67,7 +67,7 @@ const ForgotPassword = () => {
       console.log("Reset Password Payload:", payload);
 
       await axios.post(
-        "http://34.131.208.31:7001/api/User/ResetPassword",
+        "https://trackinventory.ddns.net/api/User/ResetPassword",
         payload,
         { headers: { "Content-Type": "application/json-patch+json" } }
       );

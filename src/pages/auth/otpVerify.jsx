@@ -36,7 +36,7 @@ const OtpVerify = () => {
       console.log("Sending OTP Verification Request:", payload);
 
       const response = await axios.post(
-        "http://34.131.208.31:7001/api/OTP/VerifyOTP",
+        "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
         payload,
         {
           headers: {

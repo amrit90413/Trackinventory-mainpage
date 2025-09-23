@@ -27,7 +27,7 @@ const BusinessDetails = () => {
       console.log("Sending BUSINESS DETAILS", payload);
 
       const response = await axios.post(
-        "http://34.131.208.31:7001/api/User/BusinessDetails",
+        "https://trackinventory.ddns.net/api/User/BusinessDetails",
         payload,
         {
           headers: {
