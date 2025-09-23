@@ -19,14 +19,13 @@ const SignIn = () => {
       const response = await axios.post("http://34.131.208.31:7001/api/User/Login", {
         email: data.email,
         password: data.password,
-        source: 1, // required by your API
+        source: 2,
       }, {
         headers: {
-          "Content-Type": "application/json-patch+json", // as per Swagger
+          "Content-Type": "application/json-patch+json", 
         },
       });
       console.log("Login response:", response.data);
-      // Save token or user data if provided in response
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
@@ -37,7 +36,6 @@ const SignIn = () => {
       console.error("Login error:", error);
       alert(error.response?.data?.message || "Login failed. Please try again.");
     }
-    // reset();
   };
 
   return (

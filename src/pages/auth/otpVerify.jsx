@@ -1,11 +1,13 @@
 import { Button } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 const OtpVerify = () => {
   const navigate = useNavigate();
-const userEmail = location.state?.email; 
+  const location = useLocation(); 
+  const userEmail = location.state?.email; 
+
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -28,7 +30,7 @@ const userEmail = location.state?.email;
       const payload = {
         inputotp: otp,
         isEmail: true,
-        sentTo: userEmail, // ✅ now will be correct
+        sentTo: userEmail,
       };
 
       console.log("Sending OTP Verification Request:", payload);
@@ -46,10 +48,10 @@ const userEmail = location.state?.email;
       console.log("OTP Verification Response:", response.data);
 
       if (response.status === 200) {
-        alert("✅ OTP verified successfully!");
-        navigate("/business-details");
+        alert(" OTP verified successfully!");
+        navigate("/dashboard");
       } else {
-        alert("⚠️ OTP verification failed. Please try again.");
+        alert(" OTP verification failed. Please try again.");
       }
     } catch (error) {
       console.error("OTP Verification Error:", error);
@@ -62,15 +64,9 @@ const userEmail = location.state?.email;
     }
   };
 
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 bg-gray-50">
-      <div
-        className="w-full max-w-md bg-white rounded-2xl p-8 border border-gray-200
-        shadow-2xl relative before:absolute before:inset-0 before:rounded-2xl 
-        before:bg-gradient-to-r before:from-pink-400 before:to-indigo-400 before:opacity-20 
-        before:blur-2xl before:-z-10"
-      >
+      <div className="w-full max-w-md bg-white rounded-2xl p-8 border border-gray-200 shadow-2xl relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-pink-400 before:to-indigo-400 before:opacity-20 before:blur-2xl before:-z-10">
         <h1 className="gradient text-3xl sm:text-4xl font-bold text-center pb-6">
           OTP Verification
         </h1>
@@ -93,9 +89,7 @@ const userEmail = location.state?.email;
                 variant="contained"
                 color="primary"
                 disabled={loading}
-                className="w-full py-3 text-white font-semibold rounded-lg shadow-md 
-                  bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 
-                  hover:opacity-90 transition duration-200"
+                className="w-full py-3 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 transition duration-200"
               >
                 {loading ? "Verifying..." : "Submit"}
               </Button>

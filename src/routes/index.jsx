@@ -2,15 +2,15 @@ import { createBrowserRouter } from "react-router";
 import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
-import ContactUs from "../pages/conatctUs";
 import SignIn from "../pages/auth/signIn";
 import SignUp from "../pages/auth/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
+import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
 export const routes = createBrowserRouter([
     {
         path: "/",
-        element: <LandingPage />
+        element: <SignIn/>
     },
     {
         path: "/sign-up",
@@ -36,8 +36,8 @@ export const routes = createBrowserRouter([
         path: "/privacy-policy",
         element: <PrivacyPolicy />,
     },
-    // {
-    //     path: "/contact-us",
-    //     element: <ContactUs />
-    // }
+    {
+        path:"/business-details",
+        element:<BusinessDetails/>,
+    }
 ]);
