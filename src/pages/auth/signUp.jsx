@@ -27,7 +27,7 @@ const SignUp = () => {
       console.log("Sending signup payload:", payload);
 
       const response = await axios.post(
-        "http://34.131.208.31:7001/api/User/SignUp",
+        "https://trackinventory.ddns.net/api/User/SignUp",
         payload,
         {
           headers: {
