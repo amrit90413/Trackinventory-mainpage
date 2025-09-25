@@ -20,7 +20,7 @@ const BusinessDetails = () => {
           return;
         }
         const response = await axios.get(
-          "http://34.131.208.31:7001/api/Service/GetAllServices",
+          "https://trackinventory.ddns.net/api/Service/GetAllServices",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -59,7 +59,7 @@ const BusinessDetails = () => {
       };
 
       const response = await axios.post(
-        "http://34.131.208.31:7001/api/Service/GetAllServices",
+        "https://trackinventory.ddns.net/api/Service/GetAllServices",
         payload,
         {
           headers: {
@@ -89,7 +89,6 @@ const BusinessDetails = () => {
         </h1>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-          {/* Category Dropdown */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Category <span className="text-red-500">*</span>
