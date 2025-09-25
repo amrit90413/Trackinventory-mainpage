@@ -25,10 +25,10 @@ const Header = () => {
   }, []);
 
   const handleNavClick = (id) => {
-  if (location.pathname === '/dashboard') {
+  if (location.pathname === '/') {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   } else {
-    navigate('/dashboard', { state: { scrollToId: id } });
+    navigate('/', { state: { scrollToId: id } });
   }
   setIsMenuOpen(false);
 };
@@ -88,7 +88,7 @@ const Header = () => {
             className={`text-3xl font-bold bg-clip-text text-transparent cursor-pointer ${gradientClass}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate('/')}
           >
           <img
             src={logo}

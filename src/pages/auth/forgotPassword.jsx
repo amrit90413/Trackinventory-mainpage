@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
 
 const ForgotPassword = () => {
@@ -10,10 +11,12 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState('');
-
+  const [accessToken, setAccessToken] = useState('');
+  const [spinner, setSpinner] = useState(false)
   const handleSendOtp = async (data) => {
     try {
-      setEmail(data.email); // Save email for next steps
+      setSpinner(true)
+      setEmail(data.email);
       const payload = { sentTo: data.email, type: 1 };
       console.log("Sending OTP Payload:", payload);
 
@@ -22,37 +25,36 @@ const ForgotPassword = () => {
         payload,
         { headers: { "Content-Type": "application/json-patch+json" } }
       );
-
-      alert("OTP sent to your email!");
-      setValue("otp", ""); 
+      setValue("otp", "");
       setStep(2);
     } catch (error) {
       console.error("Send OTP Error:", error);
       alert(error.response?.data?.message || "Failed to send OTP.");
+    } finally {
+      setSpinner(false)
     }
   };
 
   const handleVerifyOtp = async (data) => {
     try {
+      setSpinner(true)
       const payload = {
-        sentTo: email,
-        otp: data.otp,
-        type: "1"
+        inputotp: data.otp,
+        isEmail: true,
+        sentTo: email
       };
-
-      console.log("Verify OTP Payload:", payload);
-
-      await axios.post(
+      const response = await axios.post(
         "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
-
-      alert("OTP verified successfully!");
+      setAccessToken(response.data.accessToken);
       setStep(3);
     } catch (error) {
       console.error("Verify OTP Error:", error);
       alert(error.response?.data?.message || "OTP verification failed.");
+    } finally {
+      setSpinner(false)
     }
   };
 
@@ -61,24 +63,31 @@ const ForgotPassword = () => {
       alert("Passwords do not match!");
       return;
     }
-
     try {
-      const payload = { sentTo: email, newPassword: data.password, type: 1 };
+      setSpinner(true)
+      const payload = {
+        Password: data.password
+      };
       console.log("Reset Password Payload:", payload);
 
       await axios.post(
         "https://trackinventory.ddns.net/api/User/ResetPassword",
         payload,
-        { headers: { "Content-Type": "application/json-patch+json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`
+          }
+        }
       );
-
-      alert("✅ Password reset successfully! Please log in.");
       reset();
       setStep(1);
-      navigate("/");
+      navigate("/sign-in");
     } catch (error) {
       console.error("Reset Password Error:", error);
       alert(error.response?.data?.message || "Reset password failed.");
+    } finally {
+      setSpinner(false)
     }
   };
 
@@ -86,9 +95,10 @@ const ForgotPassword = () => {
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-2xl p-8 border border-gray-200 shadow-2xl relative">
         <h1 className="gradient text-3xl sm:text-4xl font-bold text-center pb-6">
-          Forgot Password
+          {step === 1 && "Forgot Password"}
+          {step === 2 && "Verify OTP"}
+          {step === 3 && "Reset Password"}
         </h1>
-
         {step === 1 && (
           <form onSubmit={handleSubmit(handleSendOtp)} className="space-y-5">
             <div>
@@ -111,7 +121,11 @@ const ForgotPassword = () => {
               variant="contained"
               className="w-full py-3 text-white font-semibold rounded-lg bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90"
             >
-              Send OTP
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Send OTP"
+              )}
             </Button>
           </form>
         )}
@@ -138,7 +152,11 @@ const ForgotPassword = () => {
               variant="contained"
               className="w-full py-3 text-white font-semibold rounded-lg bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90"
             >
-              Verify OTP
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Verify OTP"
+              )}
             </Button>
           </form>
         )}
@@ -181,8 +199,8 @@ const ForgotPassword = () => {
 
         <div className="text-center mt-4">
           <Link
-            className="text-sm text-gray-600 hover:underline"
-            onClick={() => navigate("/")}
+            className="text-sm text-purple-600 font-medium hover:underline"
+            onClick={() => navigate("/sign-in")}
           >
             Back to login
           </Link>

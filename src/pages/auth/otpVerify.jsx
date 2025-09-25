@@ -5,36 +5,29 @@ import { useNavigate, useLocation } from "react-router";
 
 const OtpVerify = () => {
   const navigate = useNavigate();
-  const location = useLocation(); 
-  const userEmail = location.state?.email; 
+  const location = useLocation();
+  const userEmail = location.state?.email;
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!otp) {
       alert("Please enter the OTP.");
       return;
     }
-
     if (!userEmail) {
       alert("No email found. Please go back and sign up again.");
       return;
     }
-
     try {
       setLoading(true);
-
       const payload = {
         inputotp: otp,
         isEmail: true,
         sentTo: userEmail,
       };
-
-      console.log("Sending OTP Verification Request:", payload);
-
       const response = await axios.post(
         "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
         payload,
@@ -44,20 +37,17 @@ const OtpVerify = () => {
           },
         }
       );
-
-      console.log("OTP Verification Response:", response.data);
-
       if (response.status === 200) {
-        alert(" OTP verified successfully!");
-        navigate("/dashboard");
+        localStorage.setItem("otpVerified", "true");  
+        navigate("/business-details");
       } else {
-        alert(" OTP verification failed. Please try again.");
+        alert("OTP verification failed. Please try again.");
       }
     } catch (error) {
       console.error("OTP Verification Error:", error);
       alert(
         error.response?.data?.message ||
-          "OTP verification failed. Please try again."
+        "OTP verification failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -70,7 +60,6 @@ const OtpVerify = () => {
         <h1 className="gradient text-3xl sm:text-4xl font-bold text-center pb-6">
           OTP Verification
         </h1>
-
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
             <label className="block text-base font-medium text-black mb-1">
@@ -82,7 +71,6 @@ const OtpVerify = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               placeholder="Enter 6-digit OTP"
             />
-
             <div className="flex flex-col items-center space-y-3 pt-1 mt-[20px]">
               <Button
                 type="submit"

@@ -1,22 +1,56 @@
 import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import CircularProgress from '@mui/material/CircularProgress';
 import axios from "axios";
 
 const BusinessDetails = () => {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [spinner, setSpinner] = useState(false)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setSpinner(true)
+        const authToken = localStorage.getItem("accessToken");
+        if (!authToken) {
+          alert("No access token found. Please login first.");
+          return;
+        }
+        const response = await axios.get(
+          "http://34.131.208.31:7001/api/Service/GetAllServices",
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+              Accept: "*/*",
+            },
+          }
+        );
+        setCategories(response.data || []);
+      } catch (error) {
+        alert(error.response?.data?.message || "Failed to load categories.");
+      } finally {
+        setSpinner(false)
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const onSubmit = async (data) => {
     try {
+      setSpinner(true)
+      const authToken = localStorage.getItem("accessToken");
+      if (!authToken) {
+        alert("No access token found. Please login first.");
+        return;
+      }
       const payload = {
         id: "-1",
         Name: data.businessName,
-        CategoryId: data.category, // now using selected category name
+        CategoryId: data.category,
         Country: data.country,
         State: data.state,
         Address1: data.address1,
@@ -24,32 +58,26 @@ const BusinessDetails = () => {
         ZipCode: data.zipCode,
       };
 
-      console.log("Sending BUSINESS DETAILS", payload);
-
       const response = await axios.post(
-        "https://trackinventory.ddns.net/api/User/BusinessDetails",
+        "http://34.131.208.31:7001/api/Service/GetAllServices",
         payload,
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
 
-      console.log("Response Status:", response.status);
-
       if (response.status === 200) {
         alert("Business details submitted successfully!");
-        navigate("/dashboard");
+        navigate("/");
       } else {
         alert("Failed to submit business details. Please try again.");
       }
     } catch (error) {
       console.error("Business Details Submission Error:", error);
-      alert(
-        error.response?.data?.message ||
-          "Something went wrong. Please try again."
-      );
+      alert(error.response?.data?.message || "Something went wrong. Please try again.");
     }
   };
 
@@ -71,9 +99,11 @@ const BusinessDetails = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
             >
               <option value="">Select category</option>
-              <option value="Mobile">Mobile</option>
-              <option value="Two-Wheeler">Two-Wheeler</option>
-              <option value="Gold">Gold</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
             </select>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
@@ -178,10 +208,13 @@ const BusinessDetails = () => {
             <Button
               type="submit"
               variant="contained"
-              color="primary"
               className="w-full py-3 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 transition duration-200"
             >
-              Submit
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Submit"
+              )}
             </Button>
           </div>
         </form>

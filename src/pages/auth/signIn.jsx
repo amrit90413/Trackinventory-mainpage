@@ -1,40 +1,42 @@
-import { Button } from "@mui/material";
+import Button from '@mui/material/Button';
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const SignIn = () => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm();
-
+  const [spinner, setSpinner] = useState(false)
   const navigate = useNavigate();
 
   const onSubmit = async (data) => {
     try {
+      setSpinner(true)
       const response = await axios.post("https://trackinventory.ddns.net/api/User/Login", {
         email: data.email,
         password: data.password,
         source: 2,
       }, {
         headers: {
-          "Content-Type": "application/json-patch+json", 
+          "Content-Type": "application/json-patch+json",
         },
       });
-      console.log("Login response:", response.data);
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
-      alert("Signed in successfully!");
-      navigate("/dashboard");
+      navigate("/");
     }
     catch (error) {
       console.error("Login error:", error);
       alert(error.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setSpinner(false)
     }
   };
 
@@ -103,7 +105,11 @@ const SignIn = () => {
               bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 
               hover:opacity-90 transition duration-200"
             >
-              Sign In
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Sign In"
+              )}
             </Button>
             <p className="text-sm text-black-400">
               Don’t have an account?{" "}

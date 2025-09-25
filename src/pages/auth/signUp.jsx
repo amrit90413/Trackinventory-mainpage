@@ -2,6 +2,8 @@ import { Button } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
+import CircularProgress from '@mui/material/CircularProgress';
+import { useState } from "react";
 
 const SignUp = () => {
   const {
@@ -12,9 +14,11 @@ const SignUp = () => {
   } = useForm();
 
   const navigate = useNavigate();
+  const [spinner, setSpinner] = useState(false)
 
   const onSubmit = async (data) => {
     try {
+      setSpinner(true)
       const payload = {
         Email: data.email,
         FirstName: data.firstName,
@@ -50,9 +54,11 @@ const SignUp = () => {
       } else {
         alert(
           error.response?.data?.message ||
-            "Signup failed. Please try again later."
+          "Signup failed. Please try again later."
         );
       }
+    } finally {
+      setSpinner(false)
     }
   };
 
@@ -167,13 +173,17 @@ const SignUp = () => {
               color="primary"
               className="w-full py-3 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 transition duration-200"
             >
-              Create account
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Create account"
+              )}
             </Button>
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
               <Link
                 className="text-purple-600 font-medium hover:underline"
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/sign-in")}
               >
                 Sign In
               </Link>
