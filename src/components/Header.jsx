@@ -10,6 +10,7 @@ const navItems = [
   { id: 'introduction', label: 'Introduction' },
   { id: 'how-it-works', label: 'How It Works' },
   { id: 'faqs', label: 'FAQs' },
+  { id: 'sign-up', label: 'Sign-up' }
 ];
 
 const Header = () => {
@@ -25,38 +26,38 @@ const Header = () => {
   }, []);
 
   const handleNavClick = (id) => {
-  if (location.pathname === '/') {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  } else {
-    navigate('/', { state: { scrollToId: id } });
-  }
-  setIsMenuOpen(false);
-};
+    if (location.pathname === '/') {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      navigate('/', { state: { scrollToId: id } });
+    }
+    setIsMenuOpen(false);
+  };
 
 
   const NavLink = ({ item, index, mobile }) => (
-  <motion.a
-    key={item.id}
-    onClick={() => handleNavClick(item.id)}
-    className={`group cursor-pointer ${mobile
-      ? 'block text-base px-3 py-2 rounded-lg hover:bg-pink-50'
-      : 'relative text-base px-3 py-2'
-      } text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
-    initial="hidden"
-    animate="visible"
-    transition={{ delay: index * 0.1 }}
-    whileHover={mobile ? { x: 10 } : { y: -2 }}
-  >
-    <span>{item.label}</span>
-    {!mobile && (
-      <motion.span
-        className={`absolute bottom-0 left-0 w-0 h-0.5 ${gradientClass}`}
-        whileHover={{ width: '100%' }}
-        transition={{ duration: 0.3 }}
-      />
-    )}
-  </motion.a>
-);
+    <motion.a
+      key={item.id}
+      onClick={() => handleNavClick(item.id)}
+      className={`group cursor-pointer ${mobile
+        ? 'block text-base px-3 py-2 rounded-lg hover:bg-pink-50'
+        : 'relative text-base px-3 py-2'
+        } text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
+      initial="hidden"
+      animate="visible"
+      transition={{ delay: index * 0.1 }}
+      whileHover={mobile ? { x: 10 } : { y: -2 }}
+    >
+      <span>{item.label}</span>
+      {!mobile && (
+        <motion.span
+          className={`absolute bottom-0 left-0 w-0 h-0.5 ${gradientClass}`}
+          whileHover={{ width: '100%' }}
+          transition={{ duration: 0.3 }}
+        />
+      )}
+    </motion.a>
+  );
   const CTAButton = ({ mobile }) => (
     <motion.button
       className={`group ${gradientClass} ${hoverGradient} text-white ${mobile ? 'w-full text-base py-3' : 'text-sm px-6 py-2'} rounded-full font-semibold transition-all duration-300`}
@@ -90,19 +91,15 @@ const Header = () => {
             whileTap={{ scale: 0.95 }}
             onClick={() => navigate('/')}
           >
-          <img
-            src={logo}
-            alt="Logo"
-            className="h-10 w-auto sm:h-12 md:h-14 lg:h-20 object-contain"
-          />
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-10 w-auto sm:h-12 md:h-14 lg:h-20 object-contain"
+            />
           </motion.h1>
           <nav className="hidden md:flex space-x-8">
             {navItems.map((item, index) => <NavLink key={index} item={item} index={index} />)}
           </nav>
-
-          {/* <div className="hidden md:flex items-center">
-            <CTAButton />
-          </div> */}
           <div className="md:hidden">
             <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
               <div className="w-6 h-6 flex flex-col justify-center items-center">

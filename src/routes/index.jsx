@@ -8,6 +8,7 @@ import ForgotPassword from "../pages/auth/forgotPassword";
 import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
 import PrivateRoute from "../PrivateRoute"; 
+import Subscription from "../pages/auth/subscription";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -36,6 +37,10 @@ export const routes = createBrowserRouter([
   {
     path: "/privacy-policy",
     element: <PrivacyPolicy />,
+  },
+  {
+    path:"/subscribe",
+    element:<Subscription/>
   },
   {
     path: "/business-details",

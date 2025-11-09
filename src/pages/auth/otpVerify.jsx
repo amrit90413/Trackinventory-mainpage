@@ -29,7 +29,7 @@ const OtpVerify = () => {
         sentTo: userEmail,
       };
       const response = await axios.post(
-        "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
+        "https://api.trackinventory.in/api/OTP/VerifyOTP",
         payload,
         {
           headers: {

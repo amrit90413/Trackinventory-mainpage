@@ -18,7 +18,7 @@ const SignIn = () => {
   const onSubmit = async (data) => {
     try {
       setSpinner(true)
-      const response = await axios.post("https://trackinventory.ddns.net/api/User/Login", {
+      const response = await axios.post(" https://api.trackinventory.in/api/User/Login", {
         email: data.email,
         password: data.password,
         source: 2,
