@@ -1,22 +1,43 @@
-import { Button } from "@mui/material";
+import Button from '@mui/material/Button';
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
+import { useState } from 'react';
+import CircularProgress from '@mui/material/CircularProgress';
 
 const SignIn = () => {
   const {
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm();
-
+  const [spinner, setSpinner] = useState(false)
   const navigate = useNavigate();
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
-    alert("Signed in successfully!");
-    reset();
+  const onSubmit = async (data) => {
+    try {
+      setSpinner(true)
+      const response = await axios.post(" https://api.trackinventory.in/api/User/Login", {
+        email: data.email,
+        password: data.password,
+        source: 2,
+      }, {
+        headers: {
+          "Content-Type": "application/json-patch+json",
+        },
+      });
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+      }
+      navigate("/");
+    }
+    catch (error) {
+      console.error("Login error:", error);
+      alert(error.response?.data?.message || "Login failed. Please try again.");
+    } finally {
+      setSpinner(false)
+    }
   };
 
   return (
@@ -66,14 +87,14 @@ const SignIn = () => {
             )}
           </div>
 
-           <div className="text-right mt-2">
-              <Link
-                className="text-sm text-purple-600 font-medium hover:underline"
-                onClick={() => navigate("/forgot-password")}
-              >
-                Forgot Password?
-              </Link>
-            </div>
+          <div className="text-right mt-2">
+            <Link
+              className="text-sm text-purple-600 font-medium hover:underline"
+              onClick={() => navigate("/forgot-password")}
+            >
+              Forgot Password?
+            </Link>
+          </div>
 
           <div className="flex flex-col items-center space-y-3 pt-1">
             <Button
@@ -84,7 +105,11 @@ const SignIn = () => {
               bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 
               hover:opacity-90 transition duration-200"
             >
-              Sign In
+              {spinner ? (
+                <CircularProgress size={24} sx={{ color: "white" }} />
+              ) : (
+                "Sign In"
+              )}
             </Button>
             <p className="text-sm text-black-400">
               Don’t have an account?{" "}

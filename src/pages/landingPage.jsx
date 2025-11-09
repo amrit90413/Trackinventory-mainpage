@@ -82,14 +82,6 @@ const LandingPage = () => {
         {
             question: "Can I access Track Inventory on mobile?",
             answer: "Yes, Track Inventory works across devices so you can manage your stock anytime, anywhere."
-        },
-        {
-            question: "Does Track Inventory support multiple users?",
-            answer: "Yes, you can add team members and manage permissions to collaborate on inventory management."
-        },
-        {
-            question: "Can I export reports?",
-            answer: "Yes, Track Inventory lets you generate and export sales and stock reports for better insights."
         }
 
     ];
@@ -109,11 +101,6 @@ const LandingPage = () => {
             title: "Engage",
             description: "Engage with the platform by interacting and viewing relevant content.",
             icon: "💬"
-        },
-        {
-            title: "Download our app",
-            description: "Download our app to manage your inventory anytime, anywhere with ease.",
-            icon: "🏆"
         },
         {
             title: "Trial session",
@@ -187,31 +174,6 @@ const LandingPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: "easeOut" }}
                 >
-                    <motion.div
-                        className="mb-8"
-                        variants={containerVariants}
-                        initial="hidden"
-                        animate="visible"
-                    >
-                        <motion.h1
-                            className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-6 leading-tight gradient"
-                            variants={itemVariants}
-                        >
-                            Your Moments<br />
-                            <motion.span
-                                animate={{
-                                    backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-                                }}
-                                transition={{
-                                    duration: 3,
-                                    repeat: Infinity,
-                                    ease: "easeInOut"
-                                }}
-                            >
-                                Live Here
-                            </motion.span>
-                        </motion.h1>
-                    </motion.div>
 
                     <motion.div
                         className="flex flex-col sm:flex-row gap-4 justify-center items-center"
@@ -220,7 +182,67 @@ const LandingPage = () => {
                         animate="visible"
                         transition={{ delay: 0.1 }}
                     >
+                        {/* Apple App Store Button */}
+                        <motion.button
+                            className="group bg-white/90 backdrop-blur-sm text-black px-6 py-3 rounded-xl font-semibold hover:bg-white/95 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl border border-white/20"
+                            variants={itemVariants}
+                            whileHover={{ scale: 1.02, y: -1 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                        >
+                            <div className="flex items-center gap-3">
+                                <motion.div
+                                    className="w-6 h-6"
+                                    whileHover={{ scale: 1.05, rotate: 3 }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                >
+                                    {/* Apple Icon */}
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="currentColor"
+                                        viewBox="0 0 384 512"
+                                        className="w-6 h-6"
+                                    >
+                                        <path d="M318.7 268.7c-.2-36.7 16.3-64.4 50-84.8-18.7-26.7-46.7-41.3-85.3-44-35.9-2.5-75.5 21.3-89.1 21.3-14.1 0-47.8-20.4-74.2-19.9-38.2.6-70.6 22.1-89.4 56.2-38.3 66.6-9.8 164.9 27.5 218.8 18.2 26.6 39.8 56.3 68.2 55.1 27.5-1.1 38.1-17.7 71.5-17.7 33.1 0 42.8 17.7 71.9 17.2 29.8-.5 48.6-27.1 66.7-53.8 11.6-17.1 16.4-26 25.7-45.7-67.6-25.7-63.5-101.3-63.5-102.5zM252.5 80.3c26.7-32.4 24.3-61.7 23.6-72.3-23 1.3-49.5 15.4-64.9 33.7-16.8 19.9-28.2 47.7-24.9 75.6 26.3 2 52.7-13.3 66.2-37z" />
+                                    </svg>
+                                </motion.div>
+                                <div className="text-left">
+                                    <div className="text-xs opacity-70">Download on the</div>
+                                    <div className="text-sm font-bold">App Store</div>
+                                </div>
+                            </div>
+                        </motion.button>
+
+                        {/* Google Play Store Button */}
+                        <motion.button
+                            className="group bg-white/90 backdrop-blur-sm text-black px-6 py-3 rounded-xl font-semibold hover:bg-white/95 transition-all duration-200 flex items-center gap-3 shadow-lg hover:shadow-xl border border-white/20"
+                            variants={itemVariants}
+                            whileHover={{ scale: 1.02, y: -1 }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ duration: 0.15, ease: "easeOut" }}
+                        >
+                            <div className="flex items-center gap-3">
+                                <motion.div
+                                    className="w-7 h-7"
+                                    whileHover={{ scale: 1.05, rotate: 3 }}
+                                    transition={{ duration: 0.2, ease: "easeOut" }}
+                                >
+                                    {/* Official Google Play Badge Icon */}
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" className="w-7 h-7">
+                                        <path fill="#FFD400" d="M325.3 234.3l-192-192L426.7 256z" />
+                                        <path fill="#FF3333" d="M132.7 42.3l144 144L132.7 330.3z" />
+                                        <path fill="#48FF48" d="M276.7 186.3l144 144-288 165.4z" />
+                                        <path fill="#00C3FF" d="M132.7 330.3v139.4l144-144z" />
+                                    </svg>
+                                </motion.div>
+                                <div className="text-left">
+                                    <div className="text-xs opacity-70">GET IT ON</div>
+                                    <div className="text-sm font-bold">Google Play</div>
+                                </div>
+                            </div>
+                        </motion.button>
                     </motion.div>
+
                 </motion.div>
             </section>
 
@@ -270,7 +292,7 @@ const LandingPage = () => {
                                 With Track Inventory you gain complete control over your stock. Whether you manage a small shop, a warehouse, or retail operations
                             </p>
                             <motion.button
-                                className="group bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-300" onClick={() => window.location.href = "/contact-us"}
+                                className="group bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:from-pink-600 hover:to-purple-700 transition-all duration-300"
                                 whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(219, 39, 119, 0.3)" }}
                                 whileTap={{ scale: 0.95 }}
                             >
