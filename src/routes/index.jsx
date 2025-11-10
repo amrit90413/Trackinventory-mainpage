@@ -1,5 +1,4 @@
-// src/routes/index.jsx
-import { createBrowserRouter } from "react-router-dom"; // ✅ use react-router-dom, not react-router
+import { createBrowserRouter } from "react-router-dom"; // ✅ must be react-router-dom
 
 import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
@@ -11,7 +10,7 @@ import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
 import PrivateRoute from "../PrivateRoute";
 import Subscription from "../pages/auth/subscription";
-import DeleteAccount from "../pages/deleteAccount";
+import DeleteAccount from "../pages/deleteAccount"; // ✅ lowercase filename, PascalCase component
 
 export const routes = createBrowserRouter([
   {
@@ -48,7 +47,7 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/delete-account",
-    element: <DeleteAccount />,
+    element: <DeleteAccount />, // ✅ correct casing here
   },
   {
     path: "/business-details",
