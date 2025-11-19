@@ -1,5 +1,5 @@
 import Button from '@mui/material/Button';
-import axios from "axios";
+import api from '../../composables/instance';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
@@ -17,8 +17,8 @@ const SignIn = () => {
 
   const onSubmit = async (data) => {
     try {
-      setSpinner(true)
-      const response = await axios.post(" https://api.trackinventory.in/api/User/Login", {
+      setSpinner(true);
+      const response = await api.post("/User/Login", {
         email: data.email,
         password: data.password,
         source: 2,
@@ -27,19 +27,19 @@ const SignIn = () => {
           "Content-Type": "application/json-patch+json",
         },
       });
+
       if (response.data.token) {
         localStorage.setItem("token", response.data.token);
       }
+
       navigate("/");
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Login error:", error);
       alert(error.response?.data?.message || "Login failed. Please try again.");
     } finally {
-      setSpinner(false)
+      setSpinner(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 bg-gray-50">
       <div className="w-full max-w-md bg-white rounded-2xl p-8 border border-gray-200

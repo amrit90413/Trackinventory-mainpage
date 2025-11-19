@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import CircularProgress from '@mui/material/CircularProgress';
-import axios from "axios";
+import api from '../composables/instance';
 
 const BusinessDetails = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -19,8 +19,8 @@ const BusinessDetails = () => {
           alert("No access token found. Please login first.");
           return;
         }
-        const response = await axios.get(
-          "https://trackinventory.ddns.net/api/Service/GetAllServices",
+        const response = await api.get(
+          "/Service/GetAllServices",
           {
             headers: {
               Authorization: `Bearer ${authToken}`,
@@ -58,8 +58,8 @@ const BusinessDetails = () => {
         ZipCode: data.zipCode,
       };
 
-      const response = await axios.post(
-        "https://trackinventory.ddns.net/api/Service/GetAllServices",
+      const response = await api.post(
+        "/Service/GetAllServices",
         payload,
         {
           headers: {
@@ -68,7 +68,6 @@ const BusinessDetails = () => {
           },
         }
       );
-
       if (response.status === 200) {
         alert("Business details submitted successfully!");
         navigate("/");

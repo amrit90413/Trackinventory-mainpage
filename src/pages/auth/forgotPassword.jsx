@@ -4,8 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
-import axios from "axios";
-
+import api from '../../composables/instance'
 const ForgotPassword = () => {
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm();
   const navigate = useNavigate();
@@ -18,10 +17,8 @@ const ForgotPassword = () => {
       setSpinner(true)
       setEmail(data.email);
       const payload = { sentTo: data.email, type: 1 };
-      console.log("Sending OTP Payload:", payload);
-
-      await axios.post(
-        "https://trackinventory.ddns.net/api/User/ForgotPassword",
+      await api.post(
+        "/User/ForgotPassword",
         payload,
         { headers: { "Content-Type": "application/json-patch+json" } }
       );
@@ -29,7 +26,6 @@ const ForgotPassword = () => {
       setStep(2);
     } catch (error) {
       console.error("Send OTP Error:", error);
-      alert(error.response?.data?.message || "Failed to send OTP.");
     } finally {
       setSpinner(false)
     }
@@ -43,8 +39,8 @@ const ForgotPassword = () => {
         isEmail: true,
         sentTo: email
       };
-      const response = await axios.post(
-        "https://trackinventory.ddns.net/api/OTP/VerifyOTP",
+      const response = await api.post(
+        "/OTP/VerifyOTP",
         payload,
         { headers: { "Content-Type": "application/json" } }
       );
@@ -68,10 +64,8 @@ const ForgotPassword = () => {
       const payload = {
         Password: data.password
       };
-      console.log("Reset Password Payload:", payload);
-
-      await axios.post(
-        "https://trackinventory.ddns.net/api/User/ResetPassword",
+      await api.post(
+        "/User/ResetPassword",
         payload,
         {
           headers: {
