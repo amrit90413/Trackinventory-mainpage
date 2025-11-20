@@ -26,13 +26,21 @@ const Header = () => {
   }, []);
 
   const handleNavClick = (id) => {
-    if (location.pathname === '/') {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      navigate('/', { state: { scrollToId: id } });
-    }
+  if (id === 'sign-up') {
+    navigate('/sign-up');
     setIsMenuOpen(false);
-  };
+    return;
+  }
+
+  if (location.pathname === '/') {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    navigate('/', { state: { scrollToId: id } });
+  }
+
+  setIsMenuOpen(false);
+};
+
 
 
   const NavLink = ({ item, index, mobile }) => (

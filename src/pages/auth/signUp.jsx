@@ -1,9 +1,9 @@
 import { Button } from "@mui/material";
-import axios from "axios";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
+import api from '../../composables/instance';
 
 const SignUp = () => {
   const {
@@ -16,52 +16,40 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false)
 
-  const onSubmit = async (data) => {
-    try {
-      setSpinner(true)
-      const payload = {
-        Email: data.email,
-        FirstName: data.firstName,
-        LastName: data.lastName,
-        MobileNumber: data.mobile,
-        Password: data.password,
-        id: "-1",
-      };
+ const onSubmit = async (data) => {
+  try {
+    setSpinner(true);
 
-      console.log("Sending signup payload:", payload);
+    const payload = {
+      Email: data.email,
+      FirstName: data.firstName,
+      LastName: data.lastName,
+      MobileNumber: data.mobile,
+      Password: data.password,
+      id: "-1",
+    };
 
-      const response = await axios.post(
-        "https://api.trackinventory.in/api/User/SignUp",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          }
-        }
-      );
-console.log("SUBMIT CALLED");
+    const response = await api.post("/User/SignUp", payload);
 
-      console.log("Signup response:", response.data);
+    if (response.status === 200) {
+      alert("Account created! Please verify OTP.");
+      reset();
 
-      if (response.status === 200) {
-        alert(" Account created successfully! Please verify your phone number.");
-        reset();
-        navigate("/otp-verify", { state: { email: data.email } });
-      }
-    } catch (error) {
-      console.error("Signup error:", error);
-      if (error.response?.status === 409) {
-        alert(" User already exists. Please sign in instead.");
-      } else {
-        alert(
-          error.response?.data?.message ||
-          "Signup failed. Please try again later."
-        );
-      }
-    } finally {
-      setSpinner(false)
+      navigate("/otp-verify", { state: { email: data.email, password: data.password } });
     }
-  };
+  } catch (error) {
+    console.error("Signup error:", error);
+
+    if (error.response?.status === 409) {
+      alert("User already exists. Please sign in.");
+    } else {
+      alert(error.response?.data?.message || "Signup failed, try again.");
+    }
+  } finally {
+    setSpinner(false);
+  }
+};
+
 
   return (
     <section id="sign-up">

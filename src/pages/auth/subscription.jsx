@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
-import axios from "axios";
+import api from "../../composables/instance";
 
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
@@ -24,7 +24,7 @@ const Subscription = () => {
       price: 3000,
       duration: "2 Years",
       features: ["Access to all features", "Priority Support", "2 Year Validity"],
-    }
+    },
   ];
 
   const handleSubscribe = async () => {
@@ -41,65 +41,68 @@ const Subscription = () => {
     try {
       setSpinner(true);
 
-      // STEP 1: Call initiate API
-      const initResponse = await axios.post(
-        "http://34.131.158.254:7001/api/Payment/initiate",
+      // INITIATing PAYMENT
+      const initResponse = await api.post(
+        "/Payment/initiate",
         {
           orderId: "ORDER_" + new Date().getTime(),
           amount: selectedPlan.price,
           customerName: "Your Name",
           mobileNumber: "9999999999",
           email: "user@example.com",
-          metadata: {
-            planId: selectedPlan.id
-          }
+          metadata: { planId: selectedPlan.id },
         },
         {
           headers: {
-            authToken: token,
-            "Content-Type": "application/json-patch+json"
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
 
-      const data = initResponse.data.data;
+      console.log("INIT RAW RESPONSE:", initResponse.data);
+
+      const data = initResponse.data;
 
       // Razorpay Options
       const options = {
-        key: data.key,
+        key: data.keyId,
         amount: data.amount * 100,
-        currency: "INR",
+        currency: data.currency,
         name: "Track Inventory",
-        description: selectedPlan.title,
+        description: data.description,
         order_id: data.orderId,
+
         handler: async function (response) {
+          console.log("Razorpay Response:", response);
 
-          // STEP 3: VERIFY AFTER PAYMENT
-          await axios.post(
-            "http://34.131.158.254:7001/api/Payment/verify",
-            {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature
-            },
-            {
-              headers: {
-                authToken: token,
-                "Content-Type": "application/json-patch+json"
+          try {
+            const verifyResponse = await api.post(
+              "/Payment/verify",
+              {
+                razorpayOrderId: response.razorpay_order_id,
+                razorpayPaymentId: response.razorpay_payment_id,
+                razorpaySignature: response.razorpay_signature,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
               }
-            }
-          );
+            );
 
-          alert("Payment Successful ✅ Subscription Activated!");
+            console.log("Verify Response:", verifyResponse.data);
+            alert("Payment successful! 🎉 Subscription activated.");
+          } catch (err) {
+            console.error("Verify API Error:", err);
+            alert("Verification failed.");
+          }
         },
-        theme: {
-          color: "#EC4899"
-        }
+        theme: { color: "#EC4899" },
       };
 
+      // LOADing Razorpay Window
       const razor = new window.Razorpay(options);
       razor.open();
-
     } catch (error) {
       console.error("Payment Error:", error);
       alert(error.response?.data?.message || "Something went wrong!");
