@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
-import api from '../../composables/instance';
+import api from '../composables/instance';
 
 const SignUp = () => {
   const {
