@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-new.jpg';
 
 const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
 const hoverGradient = 'hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600';
 
-// FIXED: Sign-up is now a REAL route, not a scroll section
 const navItems = [
   { id: 'introduction', label: 'Introduction', type: 'scroll' },
   { id: 'how-it-works', label: 'How It Works', type: 'scroll' },
   { id: 'faqs', label: 'FAQs', type: 'scroll' },
 
-  // ROUTE navigation only
+  // Sign-up = real route
   { id: 'sign-up', label: 'Sign-up', type: 'route', route: '/sign-up' }
 ];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,18 +28,20 @@ const Header = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // FIXED: Proper routing for Sign-up, scroll ONLY for others
   const handleNavClick = (item) => {
+    console.log('NAV CLICK:', item);
+    debugger;
 
-    // SIGN-UP → ALWAYS NAVIGATE, NEVER SCROLL
     if (item.type === 'route') {
+      console.log('Routing to:', item.route);
       navigate(item.route);
       setIsMenuOpen(false);
       return;
     }
 
-    // SCROLL LINKS
     if (item.type === 'scroll') {
+      console.log('Scrolling to section:', item.id);
+
       if (location.pathname === '/') {
         document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
       } else {
@@ -50,28 +52,39 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
+  // FIXED: Replaced <motion.a> with <motion.div> + <Link>
   const NavLink = ({ item, index, mobile }) => (
-    <motion.a
+    <motion.div
       key={item.id}
-      onClick={() => handleNavClick(item)}
-      className={`group cursor-pointer ${mobile
-        ? 'block text-base px-3 py-2 rounded-lg hover:bg-pink-50'
-        : 'relative text-base px-3 py-2'
-        } text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
       initial="hidden"
       animate="visible"
       transition={{ delay: index * 0.1 }}
       whileHover={mobile ? { x: 10 } : { y: -2 }}
     >
-      <span>{item.label}</span>
-      {!mobile && item.type === 'scroll' && (
-        <motion.span
-          className={`absolute bottom-0 left-0 w-0 h-0.5 ${gradientClass}`}
-          whileHover={{ width: '100%' }}
-          transition={{ duration: 0.3 }}
-        />
-      )}
-    </motion.a>
+      <Link
+        to={item.type === 'route' ? item.route : '#'}
+        onClick={(e) => {
+          e.preventDefault(); // prevent default anchor behavior
+          console.log('CLICKED LINK:', item);
+          debugger;
+          handleNavClick(item);
+        }}
+        className={`group cursor-pointer ${mobile
+          ? 'block text-base px-3 py-2 rounded-lg hover:bg-pink-50'
+          : 'relative text-base px-3 py-2'
+          } text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
+      >
+        <span>{item.label}</span>
+
+        {!mobile && item.type === 'scroll' && (
+          <motion.span
+            className={`absolute bottom-0 left-0 w-0 h-0.5 ${gradientClass}`}
+            whileHover={{ width: '100%' }}
+            transition={{ duration: 0.3 }}
+          />
+        )}
+      </Link>
+    </motion.div>
   );
 
   return (
@@ -86,11 +99,16 @@ const Header = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:pt-4 sm:pb-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
+
           <motion.h1
             className={`text-3xl font-bold bg-clip-text text-transparent cursor-pointer ${gradientClass}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/')}
+            onClick={() => {
+              console.log("NAVIGATE HOME");
+              debugger;
+              navigate('/');
+            }}
           >
             <img
               src={logo}
@@ -114,6 +132,7 @@ const Header = () => {
               </div>
             </motion.button>
           </div>
+
         </div>
 
         <AnimatePresence>
