@@ -12,7 +12,7 @@ const navItems = [
   { id: 'faqs', label: 'FAQs', type: 'scroll' },
 
   // Sign-up = real route
-  { id: 'sign-up', label: 'Sign-up', type: 'route', route: '/sign-up' }
+  { id: 'sign-up', label: 'test-up', type: 'route', route: '/sign-up' }
 ];
 
 const Header = () => {
