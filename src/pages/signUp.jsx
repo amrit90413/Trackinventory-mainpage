@@ -52,7 +52,8 @@ const SignUp = () => {
 
 
   return (
-    <section id="sign-up">
+   <section id="signUp">
+
       <div className="min-h-screen flex items-center justify-center px-4 sm:px-8 lg:px-16 bg-gray-50">
         <div className="w-full max-w-md bg-white rounded-2xl p-8 border border-gray-200 shadow-2xl relative before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-r before:from-pink-400 before:to-indigo-400 before:opacity-20 before:blur-2xl before:-z-10">
           <h1 className="gradient text-3xl sm:text-4xl font-bold text-center pb-6">
