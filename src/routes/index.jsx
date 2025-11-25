@@ -3,7 +3,7 @@ import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
 import SignIn from "../pages/auth/signIn";
-import SignUp from "../pages/auth/signUp";
+import SignUp from "../pages/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
 import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
