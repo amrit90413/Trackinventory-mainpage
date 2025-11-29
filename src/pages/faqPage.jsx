@@ -31,7 +31,7 @@ const FaqPage = () => {
     const faqs = [
         {
             question: "What is Track Inventory?",
-            answer: "Track Inventory is a bussiness  engagement app that rewards you for going to school sports and arts events, taking pics, and showing school spirit."
+            answer: "Track Inventory is a student engagement app that rewards you for going to school sports and arts events, taking pics, and showing school spirit."
         },
         {
             question: "How do I earn points?",
@@ -73,10 +73,10 @@ const FaqPage = () => {
             question: "What if I forget to check in at an event?",
             answer: "No worries, you will still receive points, but remember, marking your attendance boosts engagement for everyone."
         },
-        // {
-        //     question: "Can I report something inappropriate?",
-        //     answer: "Yep, you can flag any post you think breaks the guidelines, and our team or your school admins will review it."
-        // }
+        {
+            question: "Can I report something inappropriate?",
+            answer: "Yep, you can flag any post you think breaks the guidelines, and our team or your school admins will review it."
+        }
     ];
 
     <section id="faqs" className="py-20 px-4 sm:px-6 lg:px-8 bg-white scroll-mt-24">
