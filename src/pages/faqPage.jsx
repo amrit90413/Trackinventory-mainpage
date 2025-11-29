@@ -31,7 +31,7 @@ const FaqPage = () => {
     const faqs = [
         {
             question: "What is Track Inventory?",
-            answer: "Track Inventory is a student engagement app that rewards you for going to school sports and arts events, taking pics, and showing school spirit."
+            answer: "Track Inventory is a bussiness  engagement app that rewards you for going to school sports and arts events, taking pics, and showing school spirit."
         },
         {
             question: "How do I earn points?",
