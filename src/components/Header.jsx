@@ -11,7 +11,7 @@ const navItems = [
   { id: 'how-it-works', label: 'How It Works', type: 'scroll' },
   { id: 'faqs', label: 'FAQs', type: 'scroll' },
 
-  // Sign-up = real route
+  // Real route
   { id: 'sign-up', label: 'test-up', type: 'route', route: '/sign-up' }
 ];
 
@@ -30,7 +30,6 @@ const Header = () => {
 
   const handleNavClick = (item) => {
     console.log('NAV CLICK:', item);
-    debugger;
 
     if (item.type === 'route') {
       console.log('Routing to:', item.route);
@@ -40,7 +39,7 @@ const Header = () => {
     }
 
     if (item.type === 'scroll') {
-      console.log('Scrolling to section:', item.id);
+      console.log('Scrolling to:', item.id);
 
       if (location.pathname === '/') {
         document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
@@ -52,7 +51,6 @@ const Header = () => {
     setIsMenuOpen(false);
   };
 
-  // FIXED: Replaced <motion.a> with <motion.div> + <Link>
   const NavLink = ({ item, index, mobile }) => (
     <motion.div
       key={item.id}
@@ -64,10 +62,13 @@ const Header = () => {
       <Link
         to={item.type === 'route' ? item.route : '#'}
         onClick={(e) => {
-          e.preventDefault(); // prevent default anchor behavior
-          console.log('CLICKED LINK:', item);
-          debugger;
-          handleNavClick(item);
+          if (item.type === 'scroll') {
+            e.preventDefault(); 
+            handleNavClick(item);
+          } else {
+            debugger;
+            handleNavClick(item); 
+          }
         }}
         className={`group cursor-pointer ${mobile
           ? 'block text-base px-3 py-2 rounded-lg hover:bg-pink-50'
@@ -104,11 +105,7 @@ const Header = () => {
             className={`text-3xl font-bold bg-clip-text text-transparent cursor-pointer ${gradientClass}`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => {
-              console.log("NAVIGATE HOME");
-              debugger;
-              navigate('/');
-            }}
+            onClick={() => navigate('/')}
           >
             <img
               src={logo}
@@ -124,11 +121,26 @@ const Header = () => {
           </nav>
 
           <div className="md:hidden">
-            <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
+            <motion.button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-pink-600"
+            >
               <div className="w-6 h-6 flex flex-col justify-center items-center">
-                <motion.span className="block w-6 h-0.5 bg-current" animate={{ rotate: isMenuOpen ? 45 : 0, y: isMenuOpen ? 6 : -2 }} transition={{ duration: 0.3 }} />
-                <motion.span className="block w-6 h-0.5 bg-current" animate={{ opacity: isMenuOpen ? 0 : 1 }} transition={{ duration: 0.3 }} />
-                <motion.span className="block w-6 h-0.5 bg-current" animate={{ rotate: isMenuOpen ? -45 : 0, y: isMenuOpen ? -6 : 2 }} transition={{ duration: 0.3 }} />
+                <motion.span
+                  className="block w-6 h-0.5 bg-current"
+                  animate={{ rotate: isMenuOpen ? 45 : 0, y: isMenuOpen ? 6 : -2 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <motion.span
+                  className="block w-6 h-0.5 bg-current"
+                  animate={{ opacity: isMenuOpen ? 0 : 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+                <motion.span
+                  className="block w-6 h-0.5 bg-current"
+                  animate={{ rotate: isMenuOpen ? -45 : 0, y: isMenuOpen ? -6 : 2 }}
+                  transition={{ duration: 0.3 }}
+                />
               </div>
             </motion.button>
           </div>
