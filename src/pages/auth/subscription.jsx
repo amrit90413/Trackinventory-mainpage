@@ -3,12 +3,12 @@ import { Button } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../composables/instance";
+import { useAuth } from "../../context/auth/useAuth";
 
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [spinner, setSpinner] = useState(false);
-
-  const token = localStorage.getItem("authToken");
+  const { token } = useAuth();
 
   const plans = [
     {

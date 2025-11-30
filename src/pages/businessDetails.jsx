@@ -4,12 +4,14 @@ import { useNavigate } from "react-router";
 import { useEffect, useState, useRef } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../composables/instance";
+import { useAuth } from "../context/auth/useAuth";
 
 const BusinessDetails = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [spinner, setSpinner] = useState(false);
+  const { token } = useAuth();
 
   const isFetched = useRef(false);
 
@@ -21,16 +23,9 @@ const BusinessDetails = () => {
       try {
         setSpinner(true);
 
-        const authToken = localStorage.getItem("accessToken");
-
-        if (!authToken || authToken === "undefined" || authToken === "null") {
-          alert("No access token found. Please login first.");
-          return;
-        }
-
         const response = await api.get("/Service/GetAllServices", {
           headers: {
-            Authorization: `Bearer ${authToken}`,
+            Authorization: `Bearer ${token}`,
             Accept: "*/*",
           },
         });
@@ -43,17 +38,19 @@ const BusinessDetails = () => {
       }
     };
 
+    if (!token) {
+      return;
+    }
+
     fetchCategories();
-  }, []);
+  }, [token]);
 
   const onSubmit = async (data) => {
     try {
       setSpinner(true);
-
-      const authToken = localStorage.getItem("accessToken");
-
-      if (!authToken || authToken === "undefined" || authToken === "null") {
-        alert("No access token found. Please login first.");
+      if (!token) {
+        alert("Please login first.");
+        navigate("/sign-in");
         return;
       }
 
@@ -71,7 +68,7 @@ const BusinessDetails = () => {
       const response = await api.post("/Service/GetAllservices", payload, {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`,
+          Authorization: `Bearer ${token}`,
         },
       });
 

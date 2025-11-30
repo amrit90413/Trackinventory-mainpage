@@ -5,6 +5,7 @@ import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 import { useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useAuth } from "../../context/auth/useAuth";
 
 const SignIn = () => {
   const {
@@ -14,6 +15,7 @@ const SignIn = () => {
   } = useForm();
   const [spinner, setSpinner] = useState(false)
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const onSubmit = async (data) => {
     try {
@@ -28,10 +30,14 @@ const SignIn = () => {
         },
       });
 
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
+      const { accessToken, token, user } = response.data ?? {};
+      const resolvedToken = accessToken ?? token;
+
+      if (!resolvedToken) {
+        throw new Error("Authentication token missing in response.");
       }
 
+      login(resolvedToken, user);
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
