@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect, useCallback } from "react";
 import { getStoredAuth, persistAuth, clearStoredAuth } from "../../common/storage";
+import api from "../../composables/instance";
 import { AuthContext } from "./context";
 
 const createInitialState = () => {
@@ -39,6 +40,37 @@ export const AuthProvider = ({ children }) => {
       user: nextUser,
     }));
   }, []);
+
+  useEffect(() => {
+    if (!authState.token) return;
+
+    let isActive = true;
+
+    const fetchUserDetails = async () => {
+      try {
+        const { data } = await api.get("/User/GetUserDetails");
+        const resolvedUser = data?.data ?? data?.result ?? data;
+
+        if (isActive && resolvedUser) {
+          setAuthState((prev) => ({
+            ...prev,
+            user: resolvedUser,
+          }));
+        }
+      } catch (error) {
+        console.error("Failed to fetch user details", error);
+        if (error?.response?.status === 401) {
+          logout();
+        }
+      }
+    };
+
+    fetchUserDetails();
+
+    return () => {
+      isActive = false;
+    };
+  }, [authState.token, logout]);
 
   useEffect(() => {
     if (authState.token) {
