@@ -2,7 +2,6 @@ import { createBrowserRouter } from "react-router";
 import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
-import DeleteAccount from "../pages/deleteAccount";
 import SignIn from "../pages/auth/signIn";
 import SignUp from "../pages/auth/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
@@ -34,10 +33,6 @@ export const routes = createBrowserRouter([
   {
     path: "/terms-of-service",
     element: <TermsOfServices />,
-  },
-  {
-    path: "/delete-account",
-    element: <DeleteAccount />,
   },
   {
     path: "/privacy-policy",
