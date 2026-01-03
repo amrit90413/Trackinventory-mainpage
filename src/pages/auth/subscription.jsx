@@ -17,53 +17,60 @@ const Subscription = () => {
 
   const selectedService = JSON.parse(localStorage.getItem("selectedService") || "{}");
 useEffect(() => {
+  let isMounted = true;
+
   const fetchPlans = async () => {
     if (!token || !selectedService?.name) return;
 
     try {
       const res = await api.post(
         "/Service/GetByName",
-        null, // EMPTY BODY
+        null,
         {
-          params: {
-            name: selectedService.name,
-          },
+          params: { name: selectedService.name },
         }
       );
 
-      const service = res.data; // 🔥 SINGLE OBJECT
+      const service = res?.data;
 
-      if (!service) {
-        setPlans([]);
-        return;
-      }
+      if (!service || !isMounted) return;
 
-      const mappedPlans = [
-        {
+      const plans = [];
+
+      if (service.oneYearPrice > 0) {
+        plans.push({
           id: `${service.id}-1Y`,
           serviceName: service.name,
           price: service.oneYearPrice,
           duration: "1 Year",
           features: [],
-        },
-        {
+        });
+      }
+
+      if (service.twoYearPrice > 0) {
+        plans.push({
           id: `${service.id}-2Y`,
           serviceName: service.name,
           price: service.twoYearPrice,
           duration: "2 Years",
           features: [],
-        },
-      ];
+        });
+      }
 
-      setPlans(mappedPlans);
+      if (isMounted) setPlans(plans);
     } catch (err) {
       console.error("Unable to load subscription plans:", err);
-      alert("Unable to load subscription plans");
+      if (isMounted) alert("Unable to load subscription plans");
     }
   };
 
   fetchPlans();
-}, [token, selectedService]);
+
+  return () => {
+    isMounted = false;
+  };
+}, [token, selectedService?.name]);
+
 
 
   const applyPromoCode = async () => {
