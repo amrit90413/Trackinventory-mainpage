@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import api from '../../composables/instance';
+import { toast } from "react-toastify";
 
 const SignUp = () => {
   const {
@@ -14,42 +15,43 @@ const SignUp = () => {
   } = useForm();
 
   const navigate = useNavigate();
-  const [spinner, setSpinner] = useState(false)
+  const [spinner, setSpinner] = useState(false);
 
- const onSubmit = async (data) => {
-  try {
-    setSpinner(true);
+  const onSubmit = async (data) => {
+    try {
+      setSpinner(true);
 
-    const payload = {
-      Email: data.email,
-      FirstName: data.firstName,
-      LastName: data.lastName,
-      MobileNumber: data.mobile,
-      Password: data.password,
-      id: "-1",
-    };
+      const payload = {
+        Email: data.email,
+        FirstName: data.firstName,
+        LastName: data.lastName,
+        MobileNumber: data.mobile,
+        Password: data.password,
+        id: "-1",
+      };
 
-    const response = await api.post("/User/SignUp", payload);
+      const response = await api.post("/User/SignUp", payload);
 
-    if (response.status === 200) {
-      alert("Account created! Please verify OTP.");
-      reset();
+      if (response.status === 200) {
+        toast.success("Account created! Please verify OTP.");
+        reset();
 
-      navigate("/otp-verify", { state: { email: data.email, password: data.password } });
+        navigate("/otp-verify", {
+          state: { email: data.email, password: data.password },
+        });
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+
+      if (error.response?.status === 409) {
+        toast.error("User already exists. Please sign in.");
+      } else {
+        toast.error(error.response?.data?.message || "Signup failed, try again.");
+      }
+    } finally {
+      setSpinner(false);
     }
-  } catch (error) {
-    console.error("Signup error:", error);
-
-    if (error.response?.status === 409) {
-      alert("User already exists. Please sign in.");
-    } else {
-      alert(error.response?.data?.message || "Signup failed, try again.");
-    }
-  } finally {
-    setSpinner(false);
-  }
-};
-
+  };
 
   return (
     <section id="sign-up">
@@ -60,6 +62,8 @@ const SignUp = () => {
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+
+            {/* FIRST NAME */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 First Name <span className="text-red-500">*</span>
@@ -70,12 +74,11 @@ const SignUp = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               />
               {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.firstName.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
               )}
             </div>
 
+            {/* LAST NAME */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Last Name <span className="text-red-500">*</span>
@@ -86,12 +89,11 @@ const SignUp = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               />
               {errors.lastName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.lastName.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.lastName.message}</p>
               )}
             </div>
 
+            {/* EMAIL */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email Address <span className="text-red-500">*</span>
@@ -108,12 +110,11 @@ const SignUp = () => {
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.email.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
               )}
             </div>
 
+            {/* MOBILE */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Mobile Number <span className="text-red-500">*</span>
@@ -131,28 +132,23 @@ const SignUp = () => {
                 placeholder="Enter 10-digit phone number"
               />
               {errors.mobile && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.mobile.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.mobile.message}</p>
               )}
             </div>
 
+            {/* PASSWORD */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password <span className="text-red-500">*</span>
               </label>
               <input
                 type="password"
-                {...register("password", {
-                  required: "Password is required",
-                })}
+                {...register("password", { required: "Password is required" })}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
                 placeholder="Enter a secure password"
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </p>
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
               )}
             </div>
 
@@ -163,18 +159,12 @@ const SignUp = () => {
                 color="primary"
                 className="w-full py-3 text-white font-semibold rounded-lg shadow-md bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:opacity-90 transition duration-200"
               >
-                {spinner ? (
-                  <CircularProgress size={24} sx={{ color: "white" }} />
-                ) : (
-                  "Create account"
-                )}
+                {spinner ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Create account"}
               </Button>
+
               <p className="text-sm text-gray-600">
                 Already have an account?{" "}
-                <Link
-                  className="text-purple-600 font-medium hover:underline"
-                  onClick={() => navigate("/sign-in")}
-                >
+                <Link className="text-purple-600 font-medium hover:underline" onClick={() => navigate("/sign-in")}>
                   Sign In
                 </Link>
               </p>
@@ -185,4 +175,5 @@ const SignUp = () => {
     </section>
   );
 };
+
 export default SignUp;
