@@ -16,33 +16,55 @@ const Subscription = () => {
   const [promoLoading, setPromoLoading] = useState(false);
 
   const selectedService = JSON.parse(localStorage.getItem("selectedService") || "{}");
+useEffect(() => {
+  const fetchPlans = async () => {
+    if (!token || !selectedService?.name) return;
 
-  useEffect(() => {
-    const fetchPlans = async () => {
-      if (!token || !selectedService.name) return;
+    try {
+      const res = await api.post(
+        "/Service/GetByName",
+        null, // EMPTY BODY
+        {
+          params: {
+            name: selectedService.name,
+          },
+        }
+      );
 
-      try {
-        const res = await api.post("/Service/GetByName", {
-          name: selectedService.name, 
-        });
+      const service = res.data; // 🔥 SINGLE OBJECT
 
-        const mappedPlans = res.data.map((item) => ({
-          id: item.id,
-          serviceName: item.serviceName,
-          price: item.price,
-          duration: item.duration,
-          features: item.features || [],
-        }));
-
-        setPlans(mappedPlans);
-      } catch (err) {
-        console.error("Unable to load subscription plans:", err);
-        alert("Unable to load subscription plans");
+      if (!service) {
+        setPlans([]);
+        return;
       }
-    };
 
-    fetchPlans();
-  }, [token, selectedService]);
+      const mappedPlans = [
+        {
+          id: `${service.id}-1Y`,
+          serviceName: service.name,
+          price: service.oneYearPrice,
+          duration: "1 Year",
+          features: [],
+        },
+        {
+          id: `${service.id}-2Y`,
+          serviceName: service.name,
+          price: service.twoYearPrice,
+          duration: "2 Years",
+          features: [],
+        },
+      ];
+
+      setPlans(mappedPlans);
+    } catch (err) {
+      console.error("Unable to load subscription plans:", err);
+      alert("Unable to load subscription plans");
+    }
+  };
+
+  fetchPlans();
+}, [token, selectedService]);
+
 
   const applyPromoCode = async () => {
     if (!promoCode || !selectedPlan) {
