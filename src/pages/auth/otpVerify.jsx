@@ -2,12 +2,10 @@ import { Button } from "@mui/material";
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router";
 import api from "../../composables/instance";
-import { useAuth } from "../../context/auth/useAuth";
 
 const OtpVerify = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
 
   const userEmail = location.state?.email;
   const userPassword = location.state?.password; // Required for login
@@ -39,14 +37,8 @@ const OtpVerify = () => {
           source: 2,
         });
 
-        const { accessToken, token, user } = loginRes.data ?? {};
-        const resolvedToken = accessToken ?? token;
+        localStorage.setItem("accessToken", loginRes.data.accessToken);
 
-        if (!resolvedToken) {
-          throw new Error("Authentication token missing after OTP verification");
-        }
-
-        login(resolvedToken, user);
         navigate("/business-details");
       }
     } catch (err) {

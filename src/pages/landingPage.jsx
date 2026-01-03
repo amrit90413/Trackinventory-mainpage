@@ -2,7 +2,8 @@ import Header from "../components/Header"
 import Footer from "../components/Footer"
 import { useState, useEffect, useRef } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
-import { Link, useLocation } from "react-router-dom";
+import FaqPage from "./faqPage"
+import { useLocation } from "react-router-dom";
 
 const LandingPage = () => {
     const [activeFaq, setActiveFaq] = useState(null);
@@ -234,12 +235,10 @@ const LandingPage = () => {
                                         <path fill="#00C3FF" d="M132.7 330.3v139.4l144-144z" />
                                     </svg>
                                 </motion.div>
-                                <Link to={"https://play.google.com/store/apps/details?id=com.sahil90413.trackinventory&hl=es_419"} target="_blank">
                                 <div className="text-left">
                                     <div className="text-xs opacity-70">GET IT ON</div>
                                     <div className="text-sm font-bold">Google Play</div>
                                 </div>
-                                </Link>
                             </div>
                         </motion.button>
                     </motion.div>

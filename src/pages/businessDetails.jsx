@@ -4,14 +4,12 @@ import { useNavigate } from "react-router";
 import { useEffect, useState, useRef } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../composables/instance";
-import { useAuth } from "../context/auth/useAuth";
 
 const BusinessDetails = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [spinner, setSpinner] = useState(false);
-  const { token } = useAuth();
 
   const isFetched = useRef(false);
 
@@ -20,13 +18,19 @@ const BusinessDetails = () => {
       if (isFetched.current) return; // Prevent duplicate call
       isFetched.current = true;
 
-
       try {
         setSpinner(true);
 
+        const authToken = localStorage.getItem("accessToken");
+
+        if (!authToken || authToken === "undefined" || authToken === "null") {
+          alert("No access token found. Please login first.");
+          return;
+        }
+
         const response = await api.get("/Service/GetAllServices", {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${authToken}`,
             Accept: "*/*",
           },
         });
@@ -39,69 +43,51 @@ const BusinessDetails = () => {
       }
     };
 
-    if (!token) {
-      return;
-    }
-
     fetchCategories();
-  }, [token]);
+  }, []);
 
   const onSubmit = async (data) => {
     try {
       setSpinner(true);
 
-      if (!token) {
-        alert("Please login first.");
-        navigate("/sign-in");
+      const authToken = localStorage.getItem("accessToken");
+
+      if (!authToken || authToken === "undefined" || authToken === "null") {
+        alert("No access token found. Please login first.");
         return;
       }
 
       const payload = {
-        id: -1,
-        CategoryId: data.category,
+        id: "-1",
         Name: data.businessName,
-        WebsiteName: "",
-        MobileNumber: "",
+        CategoryId: data.category,
+        Country: data.country,
+        State: data.state,
         Address1: data.address1,
         Address2: data.address2 || "",
-        State: data.state,
-        Country: data.country,
         ZipCode: data.zipCode,
       };
 
-      const response = await api.post(
-        "/User/SaveBussinessDetail",
-        payload,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.post("/Service/GetAllservices", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
 
       if (response.status === 200) {
         alert("Business details submitted successfully!");
-        const selectedCategory = categories.find(
-          (c) => c.id === data.category
-        );
-
-        localStorage.setItem(
-          "selectedService",
-          JSON.stringify({
-            id: data.category,
-            name: selectedCategory?.name,
-          })
-        );
-        navigate("/subscribe");
+        navigate("/");
+      } else {
+        alert("Failed to submit business details. Please try again.");
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong.");
+      console.error("Business Details Submission Error:", error);
+      alert(error.response?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setSpinner(false);
     }
   };
-
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-8 lg:p-16">
@@ -121,16 +107,16 @@ const BusinessDetails = () => {
 
             <select
               {...register("category", { required: "Category is required" })}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
             >
               <option value="">Select category</option>
+
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
-
 
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
