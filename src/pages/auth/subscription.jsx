@@ -101,65 +101,73 @@ useEffect(() => {
   };
 
   const handleSubscribe = async () => {
-    if (!selectedPlan) {
-      alert("Please select a plan");
-      return;
-    }
+  if (!selectedPlan) {
+    alert("Please select a plan");
+    return;
+  }
 
-    if (!token) {
-      alert("Please login first!");
-      return;
-    }
-    const payableAmount = finalAmount > 0 ? finalAmount : selectedPlan.price;
+  if (!token) {
+    alert("Please login first!");
+    return;
+  }
 
-    try {
-      setSpinner(true);
+  const payableAmount =
+    finalAmount > 0 ? finalAmount : selectedPlan.price;
 
-      const initResponse = await api.post("/Payment/initiate", {
-        orderId: "ORDER_" + Date.now(),
-        amount: payableAmount,
-        customerName: user?.name,
-        mobileNumber: user?.mobile,
-        email: user?.email,
-        metadata: {
-          serviceId: selectedPlan.id,
-          promoCode: promoCode || null,
-        },
-      });
+  try {
+    setSpinner(true);
 
-      const data = initResponse.data;
+    const payload = {
+      orderId: "ORDER_" + Date.now(),
+      serviceId: selectedService.id, //service id here 
+      planDuration: selectedPlan.duration === "1 Year" ? 1 : 2, // plan duration in years
+      amount: payableAmount,
+      promoCode: promoCode?.trim() || null, 
+      metadata: {
+        planId: selectedPlan.id,
+        planDuration: selectedPlan.duration,
+      },
+    };
 
-      const options = {
-        key: data.keyId,
-        amount: data.amount * 100,
-        currency: data.currency,
-        name: "Track Inventory",
-        description: data.description,
-        order_id: data.orderId,
-        handler: async function (response) {
-          try {
-            await api.post("/Payment/verify", {
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature,
-            });
+    const initResponse = await api.post(
+      "/Payment/initiate",
+      payload
+    );
 
-            alert("Payment successful 🎉 Subscription activated");
-          } catch {
-            alert("Payment verification failed");
-          }
-        },
-        theme: { color: "#EC4899" },
-      };
+    const data = initResponse.data;
 
-      new window.Razorpay(options).open();
-    } catch (error) {
-      console.error(error);
-      alert("Payment failed");
-    } finally {
-      setSpinner(false);
-    }
-  };
+    const options = {
+      key: data.keyId,
+      amount: data.amount * 100,
+      currency: data.currency,
+      name: "Track Inventory",
+      description: data.description,
+      order_id: data.orderId,
+      handler: async function (response) {
+        try {
+          await api.post("/Payment/verify", {
+            razorpayOrderId: response.razorpay_order_id,
+            razorpayPaymentId: response.razorpay_payment_id,
+            razorpaySignature: response.razorpay_signature,
+          });
+
+          alert("Payment successful 🎉 Subscription activated");
+        } catch {
+          alert("Payment verification failed");
+        }
+      },
+      theme: { color: "#EC4899" },
+    };
+
+    new window.Razorpay(options).open();
+  } catch (error) {
+    console.error(error);
+    alert("Payment failed");
+  } finally {
+    setSpinner(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
