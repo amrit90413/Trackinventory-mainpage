@@ -20,6 +20,7 @@ const BusinessDetails = () => {
       if (isFetched.current) return; // Prevent duplicate call
       isFetched.current = true;
 
+
       try {
         setSpinner(true);
 
@@ -48,6 +49,7 @@ const BusinessDetails = () => {
   const onSubmit = async (data) => {
     try {
       setSpinner(true);
+
       if (!token) {
         alert("Please login first.");
         navigate("/sign-in");
@@ -55,36 +57,51 @@ const BusinessDetails = () => {
       }
 
       const payload = {
-        id: "-1",
-        Name: data.businessName,
+        id: -1,
         CategoryId: data.category,
-        Country: data.country,
-        State: data.state,
+        Name: data.businessName,
+        WebsiteName: "",
+        MobileNumber: "",
         Address1: data.address1,
         Address2: data.address2 || "",
+        State: data.state,
+        Country: data.country,
         ZipCode: data.zipCode,
       };
 
-      const response = await api.post("/Service/GetAllservices", payload, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await api.post(
+        "/User/SaveBussinessDetail",
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         alert("Business details submitted successfully!");
-        navigate("/");
-      } else {
-        alert("Failed to submit business details. Please try again.");
+        const selectedCategory = categories.find(
+          (c) => c.id === data.category
+        );
+
+        localStorage.setItem(
+          "selectedService",
+          JSON.stringify({
+            id: data.category,
+            name: selectedCategory?.name,
+          })
+        );
+        navigate("/subscribe");
       }
     } catch (error) {
-      console.error("Business Details Submission Error:", error);
-      alert(error.response?.data?.message || "Something went wrong. Please try again.");
+      alert(error.response?.data?.message || "Something went wrong.");
     } finally {
       setSpinner(false);
     }
   };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-8 lg:p-16">
@@ -104,16 +121,16 @@ const BusinessDetails = () => {
 
             <select
               {...register("category", { required: "Category is required" })}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+              className="w-full px-4 py-3 rounded-lg border border-gray-300"
             >
               <option value="">Select category</option>
-
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
                 </option>
               ))}
             </select>
+
 
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
