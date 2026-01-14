@@ -9,14 +9,16 @@ import {
   Box,
   Avatar,
   Divider,
-  Grid
+  Grid,
 } from "@mui/material";
 import { Person, Business, Edit, Save, Cancel, Phone, Email, Block } from "@mui/icons-material";
 import api from "../composables/instance";
 import { useAuth } from "../context/auth/useAuth";
+import { useToast } from "../context/toast/ToastContext";
 
 export default function Profile() {
   const { token } = useAuth();
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -74,7 +76,7 @@ export default function Profile() {
           zipCode: businessData?.zipCode || businessData?.ZipCode || "",
         });
       } catch {
-        alert("Failed to load profile");
+        showToast("Failed to load profile", "error");
       } finally {
         setLoading(false);
       }
@@ -82,7 +84,10 @@ export default function Profile() {
   }, [token]);
 
   const handleSave = async () => {
+    const startTime = Date.now();
     setSaving(true);
+    let toastConfig = null;
+    let wasSuccess = false;
     try {
       // Backend expects multipart/form-data with flattened Address fields
       const formData = new FormData();
@@ -138,13 +143,32 @@ export default function Profile() {
         zipCode: updatedBusinessData?.zipCode || updatedBusinessData?.ZipCode || "",
       });
 
-      alert("Profile updated successfully");
-      setEditMode(false);
+      wasSuccess = true;
+      toastConfig = {
+        message: "Profile updated successfully",
+        severity: "success",
+      };
     } catch (error) {
       console.error("Update failed:", error);
-      alert("Update failed: " + (error.response?.data?.message || error.message));
+      toastConfig = {
+        message:
+          "Update failed: " +
+          (error.response?.data?.message || error.message),
+        severity: "error",
+      };
     } finally {
-      setSaving(false);
+      const elapsed = Date.now() - startTime;
+      const delay = Math.max(0, 5000 - elapsed); // ensure at least 5 seconds spinner
+
+      setTimeout(() => {
+        setSaving(false);
+        if (toastConfig) {
+          showToast(toastConfig.message, toastConfig.severity);
+          if (wasSuccess) {
+            setEditMode(false);
+          }
+        }
+      }, delay);
     }
   };
 
@@ -504,7 +528,7 @@ export default function Profile() {
             <>
               <Button
                 variant="contained"
-                startIcon={<Save />}
+                startIcon={saving ? null : <Save />}
                 onClick={handleSave}
                 disabled={saving}
                 sx={{
@@ -522,13 +546,20 @@ export default function Profile() {
                     transform: 'translateY(-2px)',
                   },
                   '&:disabled': {
-                    background: '#ccc',
-                    color: '#666',
+                    background: 'linear-gradient(45deg, #a855f7, #6366f1)',
+                    color: 'white',
                   },
                   transition: 'all 0.3s ease',
                 }}
               >
-                {saving ? 'Saving...' : 'Save Changes'}
+                {saving ? (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <CircularProgress size={18} sx={{ color: "white" }} />
+                    Saving...
+                  </Box>
+                ) : (
+                  'Save Changes'
+                )}
               </Button>
               <Button
                 variant="outlined"

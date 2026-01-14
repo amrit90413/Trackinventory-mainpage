@@ -6,9 +6,9 @@ import { Link } from "react-router-dom";
 import { useState } from 'react';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAuth } from "../../context/auth/useAuth";
-import { toast } from "react-toastify";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useToast } from "../../context/toast/ToastContext";
 
 const SignIn = () => {
   const {
@@ -21,6 +21,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false); // 👁️ NEW
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { showToast } = useToast();
 
   const onSubmit = async (data) => {
     try {
@@ -49,18 +50,15 @@ const SignIn = () => {
 
       login(resolvedToken, user);
 
-      toast.success("Login Successful!", {
-        autoClose: 3000,
-        onClose: () => {
-          setSpinner(false);
-          navigate("/");
-        },
-      });
+      showToast("Login Successful!", "success");
+      setSpinner(false);
+      navigate("/");
 
     } catch (error) {
       console.error("Login error:", error);
-      toast.error(
-        error.response?.data?.message || "Login failed. Please try again."
+      showToast(
+        error.response?.data?.message || "Login failed. Please try again.",
+        "error"
       );
       setSpinner(false);
     }

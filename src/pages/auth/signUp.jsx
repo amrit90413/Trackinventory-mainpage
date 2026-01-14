@@ -4,9 +4,9 @@ import { Link, useNavigate } from "react-router";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import api from '../../composables/instance';
-import { toast } from "react-toastify";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import { useToast } from "../../context/toast/ToastContext";
 
 const SignUp = () => {
   const {
@@ -19,6 +19,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const { showToast } = useToast();
 
   const onSubmit = async (data) => {
     try {
@@ -36,7 +37,7 @@ const SignUp = () => {
       const response = await api.post("/User/SignUp", payload);
 
       if (response.status === 200) {
-        toast.success("Account created! Please verify OTP.");
+        showToast("Account created! Please verify OTP.", "success");
         reset();
 
         navigate("/otp-verify", {
@@ -47,9 +48,12 @@ const SignUp = () => {
       console.error("Signup error:", error);
 
       if (error.response?.status === 409) {
-        toast.error("User already exists. Please sign in.");
+        showToast("User already exists. Please sign in.", "error");
       } else {
-        toast.error(error.response?.data?.message || "Signup failed, try again.");
+        showToast(
+          error.response?.data?.message || "Signup failed, try again.",
+          "error"
+        );
       }
     } finally {
       setSpinner(false);
