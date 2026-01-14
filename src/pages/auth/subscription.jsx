@@ -5,10 +5,15 @@ import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../composables/instance";
 import { useAuth } from "../../context/auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Subscription() {
   const { token } = useAuth();
-  const selectedService = JSON.parse(localStorage.getItem("selectedService") || "{}");
+  const navigate = useNavigate();
+
+  const selectedService = JSON.parse(
+    localStorage.getItem("selectedService") || "{}"
+  );
 
   /* ---- state ---- */
   const [plans, setPlans] = useState([]);
@@ -34,10 +39,20 @@ export default function Subscription() {
 
         const plns = [];
         if (svc.oneYearPrice > 0) {
-          plns.push({ id: `${svc.id}-1Y`, serviceName: svc.name, price: svc.oneYearPrice, duration: "1 Year" });
+          plns.push({
+            id: `${svc.id}-1Y`,
+            serviceName: svc.name,
+            price: svc.oneYearPrice,
+            duration: "1 Year",
+          });
         }
         if (svc.twoYearPrice > 0) {
-          plns.push({ id: `${svc.id}-2Y`, serviceName: svc.name, price: svc.twoYearPrice, duration: "2 Years" });
+          plns.push({
+            id: `${svc.id}-2Y`,
+            serviceName: svc.name,
+            price: svc.twoYearPrice,
+            duration: "2 Years",
+          });
         }
         if (mounted) setPlans(plns);
       } catch {
@@ -45,7 +60,9 @@ export default function Subscription() {
       }
     })();
 
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [token, selectedService.name]);
 
   /* ---- promo ---- */
@@ -62,7 +79,9 @@ export default function Subscription() {
     }
     setPromoLoading(true);
     try {
-      const { data } = await api.post("/Promo/Apply", { code: promoCode.trim() });
+      const { data } = await api.post("/Promo/Apply", {
+        code: promoCode.trim(),
+      });
       if (data.success) {
         setDiscountAmount(data.discountValue);
         setFinalAmount(selectedPlan.price - data.discountValue);
@@ -96,7 +115,10 @@ export default function Subscription() {
         planDuration: selectedPlan.duration === "1 Year" ? 1 : 2,
         amount: payable,
         promoCode: finalAmount > 0 ? promoCode.trim() : null,
-        metadata: { planId: selectedPlan.id, planDuration: selectedPlan.duration },
+        metadata: {
+          planId: selectedPlan.id,
+          planDuration: selectedPlan.duration,
+        },
       };
 
       const { data: rz } = await api.post("/Payment/initiate", payload);
@@ -116,6 +138,7 @@ export default function Subscription() {
               razorpaySignature: resp.razorpay_signature,
             });
             alert("Payment successful 🎉 Subscription activated");
+            navigate("/profile");
           } catch {
             alert("Payment verification failed");
           }
@@ -131,7 +154,11 @@ export default function Subscription() {
     }
   };
 
-  /* ---- UI ---- */
+  /* ---- skip ---- */
+  const handleSkip = () => {
+    navigate("/");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-4xl">
@@ -148,20 +175,32 @@ export default function Subscription() {
                 key={p.id}
                 onClick={() => setSelectedPlan(p)}
                 className={`cursor-pointer border rounded-2xl p-10 shadow-md transition-all ${
-                  isSel ? "border-pink-500 ring-2 ring-pink-300" : "border-gray-200"
+                  isSel
+                    ? "border-pink-500 ring-2 ring-pink-300"
+                    : "border-gray-200"
                 }`}
               >
-                <h2 className="text-2xl font-semibold mb-2">{p.serviceName}</h2>
+                <h2 className="text-2xl font-semibold mb-2">
+                  {p.serviceName}
+                </h2>
 
                 <div className="mb-4">
                   {showDiscount ? (
                     <>
-                      <p className="text-lg line-through text-gray-400">₹{p.price}</p>
-                      <p className="text-3xl font-bold text-pink-500">₹{finalAmount}</p>
-                      <p className="text-sm text-green-600">You saved ₹{discountAmount}</p>
+                      <p className="text-lg line-through text-gray-400">
+                        ₹{p.price}
+                      </p>
+                      <p className="text-3xl font-bold text-pink-500">
+                        ₹{finalAmount}
+                      </p>
+                      <p className="text-sm text-green-600">
+                        You saved ₹{discountAmount}
+                      </p>
                     </>
                   ) : (
-                    <p className="text-3xl font-bold text-pink-500">₹{p.price}</p>
+                    <p className="text-3xl font-bold text-pink-500">
+                      ₹{p.price}
+                    </p>
                   )}
                 </div>
 
@@ -186,18 +225,37 @@ export default function Subscription() {
             value={promoCode}
             onChange={(e) => setPromoCode(e.target.value)}
           />
-          <Button variant="outlined" onClick={applyPromoCode} disabled={promoLoading}>
+          <Button
+            variant="outlined"
+            onClick={applyPromoCode}
+            disabled={promoLoading}
+          >
             {promoLoading ? "Applying..." : "Apply"}
           </Button>
         </div>
 
-        <div className="text-center mt-10">
+        {/* ACTION BUTTONS */}
+        <div className="text-center mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             variant="contained"
             onClick={handleSubscribe}
+            disabled={spinner}
             className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-10 py-3"
           >
-            {spinner ? <CircularProgress size={24} sx={{ color: "white" }} /> : "Subscribe Now"}
+            {spinner ? (
+              <CircularProgress size={24} sx={{ color: "white" }} />
+            ) : (
+              "Subscribe Now"
+            )}
+          </Button>
+
+          <Button
+            variant="text"
+            onClick={handleSkip}
+            disabled={spinner}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            Skip for now
           </Button>
         </div>
       </div>

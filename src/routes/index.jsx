@@ -7,8 +7,10 @@ import SignUp from "../pages/auth/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
 import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
-import PrivateRoute from "../PrivateRoute"; 
+import PrivateRoute from "../PrivateRoute";
 import Subscription from "../pages/auth/subscription";
+import Profile from "../pages/profile";
+import ChangePassword from "../pages/changePassword";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -41,6 +43,18 @@ export const routes = createBrowserRouter([
   {
     path:"/subscribe",
     element:<Subscription/>
+  },
+  {
+   path:"/profile", 
+   element:<Profile/>
+  },
+  {
+    path: "/change-password",
+    element: (
+      <PrivateRoute>
+        <ChangePassword />
+      </PrivateRoute>
+    ),
   },
   {
     path: "/business-details",

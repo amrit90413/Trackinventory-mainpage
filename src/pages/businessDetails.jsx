@@ -5,9 +5,19 @@ import { useEffect, useState, useRef } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../composables/instance";
 import { useAuth } from "../context/auth/useAuth";
+import { MenuItem, TextField } from "@mui/material";
 
 const BusinessDetails = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      country: "India",
+    },
+  });
+
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [spinner, setSpinner] = useState(false);
@@ -17,9 +27,8 @@ const BusinessDetails = () => {
 
   useEffect(() => {
     const fetchCategories = async () => {
-      if (isFetched.current) return; // Prevent duplicate call
+      if (isFetched.current) return;
       isFetched.current = true;
-
 
       try {
         setSpinner(true);
@@ -39,9 +48,7 @@ const BusinessDetails = () => {
       }
     };
 
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
     fetchCategories();
   }, [token]);
@@ -82,6 +89,7 @@ const BusinessDetails = () => {
 
       if (response.status === 200) {
         alert("Business details submitted successfully!");
+
         const selectedCategory = categories.find(
           (c) => c.id === data.category
         );
@@ -93,6 +101,7 @@ const BusinessDetails = () => {
             name: selectedCategory?.name,
           })
         );
+
         navigate("/subscribe");
       }
     } catch (error) {
@@ -102,36 +111,33 @@ const BusinessDetails = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4 sm:p-8 lg:p-16">
       <div className="w-full max-w-lg bg-white rounded-2xl p-8 border border-gray-200 shadow-2xl relative">
-
         <h1 className="gradient text-3xl sm:text-4xl font-bold text-center mb-6">
           Business Details
         </h1>
 
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
-
           {/* CATEGORY */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Category <span className="text-red-500">*</span>
-            </label>
-
-            <select
+            <TextField
+              select
+              label="Category *"
+              defaultValue="" // no default for category
               {...register("category", { required: "Category is required" })}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300"
+              fullWidth
+              className="w-full"
+              variant="outlined"
+              size="small"
             >
-              <option value="">Select category</option>
+              <MenuItem value="">Select category</MenuItem>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+                <MenuItem key={cat.id} value={cat.id}>
                   {cat.name}
-                </option>
+                </MenuItem>
               ))}
-            </select>
-
-
+            </TextField>
             {errors.category && (
               <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
             )}
@@ -161,16 +167,26 @@ const BusinessDetails = () => {
 
           {/* COUNTRY */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Country <span className="text-red-500">*</span>
-            </label>
-
-            <input
-              type="text"
+            <TextField
+              select
+              label="Country *"
+              defaultValue="India" // 🇮🇳 default selected
               {...register("country", { required: "Country is required" })}
-              className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
-              placeholder="Enter country"
-            />
+              fullWidth
+              className="w-full"
+              variant="outlined"
+              size="small"
+            >
+              <MenuItem value="India">India</MenuItem>
+              <MenuItem value="United States">United States</MenuItem>
+              <MenuItem value="United Kingdom">United Kingdom</MenuItem>
+              <MenuItem value="Canada">Canada</MenuItem>
+              <MenuItem value="Australia">Australia</MenuItem>
+              <MenuItem value="Germany">Germany</MenuItem>
+              <MenuItem value="France">France</MenuItem>
+              <MenuItem value="Singapore">Singapore</MenuItem>
+              <MenuItem value="United Arab Emirates">United Arab Emirates</MenuItem>
+            </TextField>
 
             {errors.country && (
               <p className="text-red-500 text-sm mt-1">{errors.country.message}</p>
@@ -191,7 +207,9 @@ const BusinessDetails = () => {
             />
 
             {errors.state && (
-              <p className="text-red-500 text-sm mt-1">{errors.state.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.state.message}
+              </p>
             )}
           </div>
 
@@ -203,13 +221,17 @@ const BusinessDetails = () => {
 
             <input
               type="text"
-              {...register("address1", { required: "Address 1 is required" })}
+              {...register("address1", {
+                required: "Address 1 is required",
+              })}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               placeholder="Enter address"
             />
 
             {errors.address1 && (
-              <p className="text-red-500 text-sm mt-1">{errors.address1.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.address1.message}
+              </p>
             )}
           </div>
 
@@ -235,16 +257,21 @@ const BusinessDetails = () => {
 
             <input
               type="text"
-              {...register("zipCode", { required: "Zip Code is required" })}
+              {...register("zipCode", {
+                required: "Zip Code is required",
+              })}
               className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
               placeholder="Enter zip code"
             />
 
             {errors.zipCode && (
-              <p className="text-red-500 text-sm mt-1">{errors.zipCode.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.zipCode.message}
+              </p>
             )}
           </div>
 
+          {/* SUBMIT */}
           <div className="pt-4">
             <Button
               type="submit"
@@ -263,4 +290,5 @@ const BusinessDetails = () => {
     </div>
   );
 };
+
 export default BusinessDetails;

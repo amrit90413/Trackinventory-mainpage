@@ -5,6 +5,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useState } from "react";
 import api from '../../composables/instance';
 import { toast } from "react-toastify";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 
 const SignUp = () => {
   const {
@@ -16,6 +18,7 @@ const SignUp = () => {
 
   const navigate = useNavigate();
   const [spinner, setSpinner] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSubmit = async (data) => {
     try {
@@ -141,16 +144,31 @@ const SignUp = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password <span className="text-red-500">*</span>
               </label>
-              <input
-                type="password"
-                {...register("password", { required: "Password is required" })}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
-                placeholder="Enter a secure password"
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  {...register("password", { required: "Password is required" })}
+                  className="w-full px-4 py-3 pr-12 rounded-lg border border-gray-300 
+                 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+                  placeholder="Enter a secure password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </button>
+              </div>
+
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.password.message}
+                </p>
               )}
             </div>
+
 
             <div className="flex flex-col items-center space-y-3 pt-1">
               <Button

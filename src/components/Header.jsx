@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-new.jpg';
+import { AccountCircle, Menu, Close, PersonAdd, Lock, Person } from '@mui/icons-material';
 
 const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
 const hoverGradient = 'hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600';
@@ -10,11 +11,12 @@ const navItems = [
   { id: 'introduction', label: 'Introduction' },
   { id: 'how-it-works', label: 'How It Works' },
   { id: 'faqs', label: 'FAQs' },
-  { id: 'sign-up', label: 'Sign-up' }
+  // { id: 'sign-up', label: 'Sign-up' }
 ];
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,24 +27,28 @@ const Header = () => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const handleNavClick = (id) => {
-  if (id === 'sign-up') {
-    navigate('/sign-up');
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isUserMenuOpen && !event.target.closest('.user-menu-container')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isUserMenuOpen]);
+
+  const handleUserMenuClick = (action) => {
+    if (action === 'profile') {
+      navigate('/profile');
+    } else if (action === 'signup') {
+      navigate('/sign-up');
+    } else if (action === 'changePassword') {
+      navigate('/change-password');
+    }
+    setIsUserMenuOpen(false);
     setIsMenuOpen(false);
-    return;
-  }
-
-  if (location.pathname === '/') {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  } else {
-    navigate('/', { state: { scrollToId: id } });
-  }
-
-  setIsMenuOpen(false);
-};
-
-
-
+  };
   const NavLink = ({ item, index, mobile }) => (
     <motion.a
       key={item.id}
@@ -107,6 +113,53 @@ const Header = () => {
           </motion.h1>
           <nav className="hidden md:flex space-x-8">
             {navItems.map((item, index) => <NavLink key={index} item={item} index={index} />)}
+          
+          <div className="hidden md:flex items-center space-x-4">
+            <div className="relative user-menu-container">
+              <motion.button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <AccountCircle sx={{ fontSize: 40 }} />
+              </motion.button>
+
+              <AnimatePresence>
+                {isUserMenuOpen && (
+                  <motion.div
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <button
+                      onClick={() => handleUserMenuClick('profile')}
+                      className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                    >
+                      <Person sx={{ fontSize: 20 }} />
+                      <span>Manage Profile</span>
+                    </button>
+                    <button
+                      onClick={() => handleUserMenuClick('signup')}
+                      className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                    >
+                      <PersonAdd sx={{ fontSize: 20 }} />
+                      <span>Sign Up</span>
+                    </button>
+                    <button
+                      onClick={() => handleUserMenuClick('changePassword')}
+                      className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                    >
+                      <Lock sx={{ fontSize: 20 }} />
+                      <span>Change Password</span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
           </nav>
           <div className="md:hidden">
             <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
@@ -129,7 +182,29 @@ const Header = () => {
             >
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200/50">
                 {navItems.map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
-                <div className="pt-4"></div>
+                <div className="pt-4 border-t border-gray-200/50">
+                  <button
+                    onClick={() => handleUserMenuClick('profile')}
+                    className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                  >
+                    <Person sx={{ fontSize: 20 }} />
+                    <span>Manage Profile</span>
+                  </button>
+                  <button
+                    onClick={() => handleUserMenuClick('signup')}
+                    className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                  >
+                    <PersonAdd sx={{ fontSize: 20 }} />
+                    <span>Sign Up</span>
+                  </button>
+                  <button
+                    onClick={() => handleUserMenuClick('changePassword')}
+                    className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                  >
+                    <Lock sx={{ fontSize: 20 }} />
+                    <span>Change Password</span>
+                  </button>
+                </div>
               </div>
             </motion.div>
           )}
