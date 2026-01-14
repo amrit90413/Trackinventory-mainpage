@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-new.jpg';
-import { AccountCircle, Menu, Close, PersonAdd, Lock, Person, Logout } from '@mui/icons-material';
+import { AccountCircle, Menu, Close, PersonAdd, Lock, Person, Logout, Payment } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 
 const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
@@ -107,6 +107,8 @@ const Header = () => {
       navigate('/sign-up');
     } else if (action === 'changePassword') {
       navigate('/change-password');
+    } else if (action === 'paymentHistory') {
+      navigate('/payment-history');
     } else if (action === 'logout') {
       logout();
       navigate('/sign-in');
@@ -273,6 +275,13 @@ const Header = () => {
                       <span>Change Password</span>
                     </button>
                     <button
+                      onClick={() => handleUserMenuClick('paymentHistory')}
+                      className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                    >
+                      <Payment sx={{ fontSize: 20 }} />
+                      <span>Payment History</span>
+                    </button>
+                    <button
                       onClick={() => handleUserMenuClick('logout')}
                       className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
                     >
@@ -330,6 +339,13 @@ const Header = () => {
                   >
                     <Lock sx={{ fontSize: 20 }} />
                     <span>Change Password</span>
+                  </button>
+                  <button
+                    onClick={() => handleUserMenuClick('paymentHistory')}
+                    className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                  >
+                    <Payment sx={{ fontSize: 20 }} />
+                    <span>Payment History</span>
                   </button>
                   <button
                     onClick={() => handleUserMenuClick('logout')}
