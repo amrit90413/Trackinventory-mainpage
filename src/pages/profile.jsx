@@ -21,7 +21,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editMode, setEditMode] = useState(false);
-  const [dataLoaded, setDataLoaded] = useState(false);
   const [emailHover, setEmailHover] = useState(false);
   const [categoryHover, setCategoryHover] = useState(false);
 
@@ -43,70 +42,107 @@ export default function Profile() {
   });
 
   useEffect(() => {
-    if (!token || dataLoaded) return;
+    if (!token) return;
 
     (async () => {
       try {
-        const { data } = await api.get("/User/getUserDetails", {
+        setLoading(true);
+        const { data } = await api.get("/User/GetUserDetails", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        // Extract user details from the API response
-        // API returns an array, take the first user object
         const userData = Array.isArray(data) ? data[0] : data;
-
         setProfile({
-          firstName: userData?.firstName || "",
-          lastName: userData?.lastName || "",
-          email: userData?.email || "",
-          phoneNumber: userData?.mobileNumber || "", // API uses mobileNumber
-          category: userData?.serviceName || "",
+          // Support both camelCase and PascalCase from backend
+          firstName: userData?.firstName || userData?.FirstName || "",
+          lastName: userData?.lastName || userData?.LastName || "",
+          email: userData?.email || userData?.Email || "",
+          phoneNumber: userData?.mobileNumber || userData?.MobileNumber || "",
+          category: userData?.serviceName || userData?.ServiceName || "",
         });
-
-        // Handle business data - API returns bussinessDetail as an array
-        const businessDetails = userData?.bussinessDetail || [];
-        // Take the first business detail or use empty object
-        const businessData = businessDetails.length > 0 ? businessDetails[0] : {};
-
+        // Business / address details can come either as bussinessDetail[] or Address object
+        const businessDetails =
+          userData?.bussinessDetail ||
+          userData?.BussinessDetail ||
+          (userData?.Address || userData?.address ? [userData.Address || userData.address] : []);
+        const businessData = Array.isArray(businessDetails) && businessDetails.length > 0 ? businessDetails[0] : {};
         setBusiness({
-          businessName: businessData?.name || "",
-          state: businessData?.state || "",
-          country: businessData?.country || "",
-          address1: businessData?.address1 || "",
-          address2: businessData?.address2 || "",
-          zipCode: businessData?.zipCode || "",
+          businessName: businessData?.name || businessData?.Name || "",
+          state: businessData?.state || businessData?.State || "",
+          country: businessData?.country || businessData?.Country || "",
+          address1: businessData?.address1 || businessData?.Address1 || "",
+          address2: businessData?.address2 || businessData?.Address2 || "",
+          zipCode: businessData?.zipCode || businessData?.ZipCode || "",
         });
-
-        setDataLoaded(true);
       } catch {
         alert("Failed to load profile");
       } finally {
         setLoading(false);
       }
     })();
-  }, [token, dataLoaded]);
+  }, [token]);
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      await api.post(
-        "/User/SaveBussinessDetail",
-        {
-          businessName: business.businessName,
-          state: business.state,
-          country: business.country,
-          address1: business.address1,
-          address2: business.address2,
-          zipCode: business.zipCode,
-          categoryId: profile.category,
+      // Backend expects multipart/form-data with flattened Address fields
+      const formData = new FormData();
+      formData.append("FirstName", profile.firstName || "");
+      formData.append("LastName", profile.lastName || "");
+      formData.append("Email", profile.email || "");
+      formData.append("MobileNumber", profile.phoneNumber || "");
+      formData.append("ProfilePicUrl", ""); // Not handling file upload here yet
+      formData.append("Address.Name", business.businessName || "");
+      formData.append("Address.Address1", business.address1 || "");
+      formData.append("Address.Address2", business.address2 || "");
+      formData.append("Address.State", business.state || "");
+      formData.append("Address.Country", business.country || "");
+      formData.append("Address.ZipCode", business.zipCode || "");
+      formData.append("Address.MobileNumber", profile.phoneNumber || "");
+
+      console.log("Sending FormData payload for CreateUpdate"); // Debug log
+
+      const response = await api.post("/User/CreateUpdate", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
         },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      });
+
+      const { data: updatedData } = await api.get("/User/GetUserDetails", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const updatedUserData = Array.isArray(updatedData) ? updatedData[0] : updatedData;
+      setProfile({
+        firstName: updatedUserData?.firstName || updatedUserData?.FirstName || "",
+        lastName: updatedUserData?.lastName || updatedUserData?.LastName || "",
+        email: updatedUserData?.email || updatedUserData?.Email || "",
+        phoneNumber: updatedUserData?.mobileNumber || updatedUserData?.MobileNumber || "",
+        category: updatedUserData?.serviceName || updatedUserData?.ServiceName || "",
+      });
+      const updatedBusinessDetails =
+        updatedUserData?.bussinessDetail ||
+        updatedUserData?.BussinessDetail ||
+        (updatedUserData?.Address || updatedUserData?.address
+          ? [updatedUserData.Address || updatedUserData.address]
+          : []);
+      const updatedBusinessData =
+        Array.isArray(updatedBusinessDetails) && updatedBusinessDetails.length > 0
+          ? updatedBusinessDetails[0]
+          : {};
+      setBusiness({
+        businessName: updatedBusinessData?.name || updatedBusinessData?.Name || "",
+        state: updatedBusinessData?.state || updatedBusinessData?.State || "",
+        country: updatedBusinessData?.country || updatedBusinessData?.Country || "",
+        address1: updatedBusinessData?.address1 || updatedBusinessData?.Address1 || "",
+        address2: updatedBusinessData?.address2 || updatedBusinessData?.Address2 || "",
+        zipCode: updatedBusinessData?.zipCode || updatedBusinessData?.ZipCode || "",
+      });
 
       alert("Profile updated successfully");
       setEditMode(false);
-    } catch {
-      alert("Update failed");
+    } catch (error) {
+      console.error("Update failed:", error);
+      alert("Update failed: " + (error.response?.data?.message || error.message));
     } finally {
       setSaving(false);
     }
