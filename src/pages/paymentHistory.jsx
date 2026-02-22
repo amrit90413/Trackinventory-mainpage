@@ -35,7 +35,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../composables/instance";
 import { useAuth } from "../context/auth/useAuth";
 import { useToast } from "../context/toast/ToastContext";
-import { IconButton } from "@mui/material";
 
 const normalizeList = (data) => {
   if (!data) return [];
@@ -89,7 +88,6 @@ export default function PaymentHistory() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-fetch when token changes
   }, [token]);
 
   // GET /api/Payment/transaction/{merchantTransactionId} - single transaction details
