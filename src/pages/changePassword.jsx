@@ -198,12 +198,11 @@ export default function ChangePassword() {
       }}
     >
       <Box sx={{ maxWidth: 500, mx: 'auto' }}>
-        {/* Header */}
-        <Box sx={{ mb: 4 }}>
+        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',mt: 5 }}>
           <IconButton
             onClick={() => navigate(-1)}
             sx={{
-              color: 'white',
+              color: '#667eea',
               mb: 2,
               '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
             }}

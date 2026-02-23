@@ -11,6 +11,8 @@ import PrivateRoute from "../PrivateRoute";
 import Subscription from "../pages/auth/subscription";
 import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
+import PaymentHistory from "../pages/paymentHistory";
+import MobileList from "../components/mobileList";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -63,5 +65,17 @@ export const routes = createBrowserRouter([
         <BusinessDetails />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/payment-history",
+    element: (
+      <PrivateRoute>
+        <PaymentHistory />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/mobiles",
+    element: <MobileList/>,
   },
 ]);

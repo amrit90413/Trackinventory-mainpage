@@ -89,13 +89,12 @@ export default function Profile() {
     let toastConfig = null;
     let wasSuccess = false;
     try {
-      // Backend expects multipart/form-data with flattened Address fields
       const formData = new FormData();
       formData.append("FirstName", profile.firstName || "");
       formData.append("LastName", profile.lastName || "");
       formData.append("Email", profile.email || "");
       formData.append("MobileNumber", profile.phoneNumber || "");
-      formData.append("ProfilePicUrl", ""); // Not handling file upload here yet
+      formData.append("ProfilePicUrl", ""); 
       formData.append("Address.Name", business.businessName || "");
       formData.append("Address.Address1", business.address1 || "");
       formData.append("Address.Address2", business.address2 || "");

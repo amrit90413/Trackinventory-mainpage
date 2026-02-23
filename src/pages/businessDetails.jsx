@@ -88,8 +88,6 @@ const BusinessDetails = () => {
       );
 
       if (response.status === 200) {
-        alert("Business details submitted successfully!");
-
         const selectedCategory = categories.find(
           (c) => c.id === data.category
         );
