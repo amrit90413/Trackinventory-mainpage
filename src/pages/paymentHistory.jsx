@@ -54,7 +54,6 @@ export default function PaymentHistory() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
-  // GET /api/Payment/transactions/me + GET /api/Payment/dashboard/me - run once per token (no showToast in deps to avoid duplicate calls)
   useEffect(() => {
     if (!token) return;
 
@@ -88,7 +87,6 @@ export default function PaymentHistory() {
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-fetch when token changes
   }, [token]);
 
   // GET /api/Payment/transaction/{merchantTransactionId} - single transaction details
