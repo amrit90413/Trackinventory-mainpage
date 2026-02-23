@@ -15,6 +15,12 @@ import {
   TableHead,
   TableRow,
   Paper,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import {
   Payment,
@@ -23,12 +29,19 @@ import {
   Schedule,
   Receipt,
   ArrowBack,
+  Visibility,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import api from "../composables/instance";
 import { useAuth } from "../context/auth/useAuth";
 import { useToast } from "../context/toast/ToastContext";
 import { IconButton } from "@mui/material";
+
+const normalizeList = (data) => {
+  if (!data) return [];
+  if (Array.isArray(data)) return data;
+  return data?.data ?? data?.payments ?? data?.result ?? data?.transactions ?? [];
+};
 
 export default function PaymentHistory() {
   const { token } = useAuth();
@@ -37,49 +50,85 @@ export default function PaymentHistory() {
 
   const [loading, setLoading] = useState(true);
   const [payments, setPayments] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
 
+  // GET /api/Payment/transactions/me + GET /api/Payment/dashboard/me - run once per token (no showToast in deps to avoid duplicate calls)
   useEffect(() => {
     if (!token) return;
 
+    let cancelled = false;
     (async () => {
       try {
         setLoading(true);
-        // Try common payment history endpoints
-        let data;
-        try {
-          const response = await api.get("/Payment/GetHistory", {
+        const [txRes, dashRes] = await Promise.all([
+          api.get("/Payment/transactions/me", {
             headers: { Authorization: `Bearer ${token}` },
-          });
-          data = response.data;
-        } catch (err) {
-          // Try alternative endpoint
-          try {
-            const response = await api.get("/Payment/History", {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            data = response.data;
-          } catch (err2) {
-            // Try another alternative
-            const response = await api.get("/Payment/GetPayments", {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            data = response.data;
-          }
-        }
+          }),
+          api.get("/Payment/dashboard/me", {
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => ({ data: null })),
+        ]);
 
-        // Handle different response formats
-        const paymentList =
-          Array.isArray(data) ? data : data?.data || data?.payments || data?.result || [];
-
+        if (cancelled) return;
+        const paymentList = normalizeList(txRes.data);
         setPayments(paymentList);
+        if (dashRes?.data != null) setDashboard(dashRes.data);
       } catch (error) {
-        console.error("Failed to load payment history:", error);
-        showToast("Failed to load payment history", "error");
+        if (!cancelled) {
+          console.error("Failed to load payment history:", error);
+          showToast(error.response?.data?.message || "Failed to load payment history", "error");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
-  }, [token, showToast]);
+
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-fetch when token changes
+  }, [token]);
+
+  // GET /api/Payment/transaction/{merchantTransactionId} - single transaction details
+  const fetchTransactionDetail = async (id) => {
+    const merchantTransactionId = id != null ? String(id) : "";
+    if (!merchantTransactionId.trim()) return;
+    setDetailLoading(true);
+    setDetailOpen(true);
+    setSelectedTransaction(null);
+    try {
+      const { data } = await api.get(
+        `/Payment/transaction/${encodeURIComponent(merchantTransactionId)}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSelectedTransaction(data);
+    } catch (error) {
+      console.error("Failed to load transaction detail:", error);
+      showToast(error.response?.data?.message || "Failed to load transaction details", "error");
+      setDetailOpen(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const handleCloseDetail = () => {
+    setDetailOpen(false);
+    setSelectedTransaction(null);
+  };
+
+  const getMerchantTransactionId = (payment) =>
+    payment.merchantTransactionId ??
+    payment.MerchantTransactionId ??
+    payment.transactionId ??
+    payment.TransactionId ??
+    payment.orderId ??
+    payment.OrderId ??
+    payment.razorpayOrderId ??
+    payment.id ??
+    payment.Id;
 
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -97,8 +146,10 @@ export default function PaymentHistory() {
     }
   };
 
+  const statusStr = (s) => (s == null || typeof s === "object" ? "" : String(s)).toLowerCase();
+
   const getStatusColor = (status) => {
-    const statusLower = (status || "").toLowerCase();
+    const statusLower = statusStr(status);
     if (statusLower === "success" || statusLower === "completed" || statusLower === "paid") {
       return "success";
     }
@@ -112,7 +163,7 @@ export default function PaymentHistory() {
   };
 
   const getStatusIcon = (status) => {
-    const statusLower = (status || "").toLowerCase();
+    const statusLower = statusStr(status);
     if (statusLower === "success" || statusLower === "completed" || statusLower === "paid") {
       return <CheckCircle sx={{ fontSize: 20 }} />;
     }
@@ -191,6 +242,30 @@ export default function PaymentHistory() {
 
             <Divider sx={{ mb: 3 }} />
 
+            {/* Dashboard summary from GET /Payment/dashboard/me */}
+            {dashboard != null && Object.keys(dashboard).length > 0 && (
+              <Box sx={{ mb: 3, p: 2, borderRadius: 2, bgcolor: "grey.50", border: "1px solid", borderColor: "grey.200" }}>
+                <Typography variant="subtitle2" sx={{ color: "text.secondary", mb: 1 }}>
+                  Summary
+                </Typography>
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+                  {typeof dashboard.totalAmount === "number" && (
+                    <Typography variant="body1" sx={{ fontWeight: 600 }}>
+                      Total: ₹{dashboard.totalAmount.toFixed(2)}
+                    </Typography>
+                  )}
+                  {typeof dashboard.totalTransactions === "number" && (
+                    <Typography variant="body1" sx={{ color: "text.secondary" }}>
+                      Transactions: {dashboard.totalTransactions}
+                    </Typography>
+                  )}
+                  {dashboard.subscriptionStatus != null && (
+                    <Chip size="small" label={String(dashboard.subscriptionStatus)} color="primary" variant="outlined" />
+                  )}
+                </Box>
+              </Box>
+            )}
+
             {payments.length === 0 ? (
               <Box
                 sx={{
@@ -227,14 +302,19 @@ export default function PaymentHistory() {
                       <TableCell sx={{ fontWeight: 600, color: "#333" }} align="center">
                         Status
                       </TableCell>
+                      <TableCell sx={{ fontWeight: 600, color: "#333" }} align="center">
+                        Actions
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {payments.map((payment, index) => {
+                      const merchantTransactionId = getMerchantTransactionId(payment);
                       const transactionId =
                         payment.transactionId ||
                         payment.orderId ||
                         payment.razorpayOrderId ||
+                        payment.merchantTransactionId ||
                         payment.id ||
                         `TXN-${index + 1}`;
                       const date =
@@ -309,7 +389,7 @@ export default function PaymentHistory() {
                           <TableCell align="center">
                             <Chip
                               icon={getStatusIcon(status)}
-                              label={status}
+                              label={status != null && typeof status !== "object" ? String(status) : "Unknown"}
                               color={getStatusColor(status)}
                               size="small"
                               sx={{
@@ -317,6 +397,21 @@ export default function PaymentHistory() {
                                 textTransform: "capitalize",
                               }}
                             />
+                          </TableCell>
+                          <TableCell align="center">
+                            <IconButton
+                              size="small"
+                              color="primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                                const id = merchantTransactionId || transactionId;
+                                if (id) fetchTransactionDetail(id);
+                              }}
+                              title="View details"
+                            >
+                              <Visibility fontSize="small" />
+                            </IconButton>
                           </TableCell>
                         </TableRow>
                       );
@@ -327,6 +422,77 @@ export default function PaymentHistory() {
             )}
           </CardContent>
         </Card>
+
+        {/* Single transaction detail: GET /Payment/transaction/{merchantTransactionId} */}
+        <Dialog open={detailOpen} onClose={handleCloseDetail} maxWidth="sm" fullWidth>
+          <DialogTitle>Transaction details</DialogTitle>
+          <DialogContent>
+            {detailLoading ? (
+              <Box sx={{ display: "flex", justifyContent: "center", py: 3 }}>
+                <CircularProgress size={32} />
+              </Box>
+            ) : selectedTransaction ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5, pt: 1 }}>
+                {/* Real payment state from backend: razorpayPaymentId & completedAt = payment done */}
+                {(() => {
+                  const isPaid = !!(selectedTransaction.razorpayPaymentId ?? selectedTransaction.completedAt);
+                  return (
+                    <Box
+                      sx={{
+                        p: 1.5,
+                        mb: 1,
+                        borderRadius: 1,
+                        bgcolor: isPaid ? "success.light" : "error.main",
+                        color: isPaid ? "success.dark" : "white",
+                      }}
+                    >
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: "inherit" }}>
+                        {isPaid ? "Payment completed" : "Payment not completed"}
+                      </Typography>
+                      {!isPaid && (
+                        <Typography variant="caption" display="block" sx={{ mt: 0.5, color: "white" }}>
+                          Order was created. Complete payment in Razorpay to activate your plan.
+                        </Typography>
+                      )}
+                    </Box>
+                  );
+                })()}
+                {Object.entries(selectedTransaction).map(([key, value]) => {
+                  if (value == null || typeof value === "object") return null;
+                  const keyLower = key.toLowerCase();
+                  const isDateField =
+                    (keyLower.includes("date") || keyLower === "createdat" || keyLower === "updatedat" || keyLower === "timestamp") &&
+                    !keyLower.includes("status") &&
+                    keyLower !== "status";
+                  const label = key.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase());
+                  let displayValue = isDateField ? formatDate(value) : String(value);
+                  if ((keyLower === "status" || keyLower === "paymentstatus") && typeof value === "number") {
+                    const isPaid = !!(selectedTransaction.razorpayPaymentId ?? selectedTransaction.completedAt);
+                    if (!isPaid && value === 1) {
+                      displayValue = "Order created (payment pending)";
+                    } else {
+                      const statusMap = { 0: "Pending", 1: "Success", 2: "Failed", 3: "Cancelled" };
+                      displayValue = statusMap[value] ?? displayValue;
+                    }
+                  }
+                  return (
+                    <Box key={key} sx={{ display: "flex", justifyContent: "space-between", gap: 2 }}>
+                      <Typography variant="body2" color="text.secondary">
+                        {label}
+                      </Typography>
+                      <Typography variant="body2" sx={{ fontWeight: 500, textAlign: "right" }}>
+                        {displayValue}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            ) : null}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCloseDetail}>Close</Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     </Box>
   );

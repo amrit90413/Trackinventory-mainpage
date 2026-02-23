@@ -12,7 +12,7 @@ import Subscription from "../pages/auth/subscription";
 import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
 import PaymentHistory from "../pages/paymentHistory";
-import DeleteAccount from "../pages/deleteAccount"; 
+import MobileList from "../components/mobileList";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -77,5 +77,9 @@ export const routes = createBrowserRouter([
         <PaymentHistory />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/mobiles",
+    element: <MobileList/>,
   },
 ]);
