@@ -6,7 +6,10 @@
 .mobile-title{font-size:1.5rem; font-weight:700; margin:0}
 .mobile-sub{color:#6b7280; margin:4px 0 0}
 
-.mobile-cards{display:flex; flex-direction:column; gap:14px}
+.mobile-cards{display:grid; grid-template-columns:1fr; gap:14px}
+@media (min-width:768px){
+  .mobile-cards{grid-template-columns:repeat(2,1fr)}
+}
 .mobile-card{background:linear-gradient(180deg,#ffffff,#fbfbff); border:1px solid #e6e7f0; border-radius:12px; box-shadow:0 6px 18px rgba(16,24,40,0.05); overflow:hidden; transition:transform .18s ease, box-shadow .18s ease}
 .mobile-card:hover{transform:translateY(-4px); box-shadow:0 12px 28px rgba(16,24,40,0.08)}
 .mobile-card-main{display:flex; gap:16px; padding:16px}

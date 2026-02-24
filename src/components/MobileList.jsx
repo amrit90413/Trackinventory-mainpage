@@ -125,7 +125,9 @@ export default function MobileList() {
 
       <div className="mobile-cards">
         {phones.length === 0 ? (
-          <p style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '2rem' }}>No mobiles found.</p>
+          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px', padding: '2rem' }}>
+            <p style={{ margin: 0, color: '#6b7280' }}>No mobiles found.</p>
+          </div>
         ) : phones.map((phone) => (
           <article key={phone.id} className={`mobile-card ${expanded === phone.id ? 'expanded' : ''}`}> 
             <div className="mobile-card-main">
