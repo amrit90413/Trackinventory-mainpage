@@ -12,7 +12,7 @@ import Subscription from "../pages/auth/subscription";
 import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
 import PaymentHistory from "../pages/paymentHistory";
-import MobileList from "../components/mobileList";
+import MobileList from "../components/MobileList";
 import DeleteAccount from "../pages/deleteAccount"; 
 export const routes = createBrowserRouter([
   {
@@ -84,3 +84,4 @@ export const routes = createBrowserRouter([
     element: <MobileList/>,
   },
 ]);
+

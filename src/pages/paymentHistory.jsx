@@ -54,6 +54,7 @@ export default function PaymentHistory() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
 
+  // GET /api/Payment/transactions/me + GET /api/Payment/dashboard/me - run once per token (no showToast in deps to avoid duplicate calls)
   useEffect(() => {
     if (!token) return;
 
