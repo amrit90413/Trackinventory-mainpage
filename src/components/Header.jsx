@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-new.jpg';
-import { AccountCircle, Menu, Close, PersonAdd, Lock, Person, Logout, Payment } from '@mui/icons-material';
+import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 
 const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
@@ -193,11 +193,13 @@ const Header = () => {
                 onMouseLeave={() => setShowTrialTooltip(false)}
               >
                 <motion.button
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-md border border-white/70"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-md border border-white/70"
+                  animate={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <span className="text-lg">🎁</span>
+                  <span className="text-2xl">🎁</span>
                 </motion.button>
 
                 {/* Tooltip box shown while hovering the gift icon or tooltip */}
@@ -237,7 +239,7 @@ const Header = () => {
               </div>
             )}
 
-            {navItems.map((item, index) => <NavLink key={index} item={item} index={index} />)}
+            {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} />)}
             <motion.a
               onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }}
               className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
@@ -283,13 +285,6 @@ const Header = () => {
                         <span>Payment History</span>
                       </button>
                       <button
-                        onClick={() => handleUserMenuClick('signup')}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
-                      >
-                        <PersonAdd sx={{ fontSize: 20 }} />
-                        <span>Sign Up</span>
-                      </button>
-                      <button
                         onClick={() => handleUserMenuClick('changePassword')}
                         className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
                       >
@@ -333,7 +328,28 @@ const Header = () => {
               transition={{ duration: 0.3 }}
             >
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200/50">
-                {navItems.map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
+                {showTrialBanner && trialMessage && (
+                  <div
+                    className="mb-3 p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-lg"
+                    onClick={() => { setIsMenuOpen(false); navigate('/subscribe'); }}
+                  >
+                    <div className="flex items-center gap-3 cursor-pointer">
+                      <motion.span
+                        className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-3xl shrink-0"
+                        animate={{ rotate: [0, -10, 10, 0] }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      >
+                        🎁
+                      </motion.span>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">Trial status</p>
+                        <p className="text-xs leading-snug mt-0.5">{trialMessage}</p>
+                        <span className="text-sm font-semibold underline mt-1 inline-block">View plans →</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
                 <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
                 {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">

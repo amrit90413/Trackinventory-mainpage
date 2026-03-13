@@ -15,7 +15,6 @@ export default function Subscription() {
     localStorage.getItem("selectedService") || "{}"
   );
 
-  /* ---- state ---- */
   const [plans, setPlans] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState(null);
 
@@ -163,7 +162,7 @@ export default function Subscription() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-4xl">
         <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-          Pricing options for every budget
+          Subscribe now
         </h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
