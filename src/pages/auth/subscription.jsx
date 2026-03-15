@@ -8,7 +8,8 @@ import { useAuth } from "../../context/auth/useAuth";
 import { useNavigate } from "react-router-dom";
 
 export default function Subscription() {
-  const { token } = useAuth();
+  const auth = useAuth();
+  const { token } = auth;
   const navigate = useNavigate();
 
   const selectedService = JSON.parse(
@@ -28,33 +29,70 @@ export default function Subscription() {
   /* ---- fetch plans ---- */
   useEffect(() => {
     let mounted = true;
-    if (!token || !selectedService?.name) return;
+
+    const serviceName = selectedService?.name || auth.user?.serviceName || auth.user?.businessDetail?.[0]?.categoryName;
+
+    console.log("Subscription Check:", {
+      hasToken: !!token,
+      localStorage: selectedService,
+      userProfile: auth.user,
+      discoveredName: serviceName
+    });
+
+    if (!token) return;
+
+    if (!serviceName) {
+      console.warn("No service name found in localStorage or user profile");
+      return;
+    }
 
     (async () => {
       try {
-        const { data: svc } = await api.post("/Service/GetByName", null, {
-          params: { name: selectedService.name },
+        console.log(`[API REQUEST] Fetching plans for service: "${serviceName}"`);
+        const { data: svc } = await api.post("Service/GetByName", null, {
+          params: { name: serviceName },
         });
 
+        if (!svc) {
+          console.error(`[API ERROR] Service "${serviceName}" not found in database`);
+          return;
+        }
+
+        // Handle both PascalCase and camelCase
+        const sId = svc.id || svc.Id;
+        const sName = svc.name || svc.Name || serviceName;
+        const sOneYear = svc.oneYearPrice || svc.OneYearPrice || 0;
+        const sTwoYear = svc.twoYearPrice || svc.TwoYearPrice || 0;
+
+        console.log("[API SUCCESS] Service data:", { sId, sName, sOneYear, sTwoYear });
+
         const plns = [];
-        if (svc.oneYearPrice > 0) {
+        if (sOneYear > 0) {
           plns.push({
-            id: `${svc.id}-1Y`,
-            serviceName: svc.name,
-            price: svc.oneYearPrice,
+            id: `${sId}-1Y`,
+            serviceId: sId,
+            serviceName: sName,
+            price: sOneYear,
             duration: "1 Year",
           });
         }
-        if (svc.twoYearPrice > 0) {
+        if (sTwoYear > 0) {
           plns.push({
-            id: `${svc.id}-2Y`,
-            serviceName: svc.name,
-            price: svc.twoYearPrice,
+            id: `${sId}-2Y`,
+            serviceId: sId,
+            serviceName: sName,
+            price: sTwoYear,
             duration: "2 Years",
           });
         }
-        if (mounted) setPlans(plns);
-      } catch {
+        if (mounted) {
+          setPlans(plns);
+          if (plns.length === 0) {
+            console.warn("No plans found for prices > 0");
+          }
+        }
+      } catch (err) {
+        console.error("Subscription load error details:", err);
         if (mounted) alert("Unable to load subscription plans");
       }
     })();
@@ -62,7 +100,7 @@ export default function Subscription() {
     return () => {
       mounted = false;
     };
-  }, [token, selectedService.name]);
+  }, [token, selectedService?.name, auth.user?.businessDetail?.categoryName]);
 
   /* ---- promo ---- */
   const clearPromo = () => {
@@ -110,7 +148,7 @@ export default function Subscription() {
     try {
       const payload = {
         orderId: "ORDER_" + Date.now(),
-        serviceId: selectedService.id,
+        serviceId: selectedPlan.serviceId || selectedService.id,
         planDuration: selectedPlan.duration === "1 Year" ? 1 : 2,
         amount: payable,
         promoCode: finalAmount > 0 ? promoCode.trim() : null,
@@ -173,11 +211,10 @@ export default function Subscription() {
               <div
                 key={p.id}
                 onClick={() => setSelectedPlan(p)}
-                className={`cursor-pointer border rounded-2xl p-10 shadow-md transition-all ${
-                  isSel
+                className={`cursor-pointer border rounded-2xl p-10 shadow-md transition-all ${isSel
                     ? "border-pink-500 ring-2 ring-pink-300"
                     : "border-gray-200"
-                }`}
+                  }`}
               >
                 <h2 className="text-2xl font-semibold mb-2">
                   {p.serviceName}
