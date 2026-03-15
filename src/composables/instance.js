@@ -1,20 +1,16 @@
 import axios from "axios";
-import { getStoredToken } from "../common/storage";
 
 const api = axios.create({
-  baseURL: "https://api.trackinventory.in/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://api.trackinventory.in/api",
   headers: {
     "Content-Type": "application/json",
   },
 });
 
 api.interceptors.request.use((config) => {
-  const token = getStoredToken();
-  if (token && !config.headers?.Authorization) {
-    config.headers = {
-      ...config.headers,
-      Authorization: `Bearer ${token}`,
-    };
+  const token = localStorage.getItem("accessToken");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
