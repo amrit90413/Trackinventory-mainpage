@@ -2,7 +2,7 @@ import axios from "axios";
 import { getStoredToken } from "../common/storage";
 
 const api = axios.create({
-  baseURL: "https://api.trackinventory.in/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "https://api.trackinventory.in/api",
   headers: {
     "Content-Type": "application/json",
   },
