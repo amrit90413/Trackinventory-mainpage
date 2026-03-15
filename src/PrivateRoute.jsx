@@ -1,10 +1,12 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "./context/auth/useAuth";
 
 const PrivateRoute = ({ children }) => {
-  const otpVerified = localStorage.getItem("otpVerified");
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
 
-  if (!otpVerified) {
-    return <Navigate to="/otp-verify" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/sign-in" replace state={{ from: location }} />;
   }
 
   return children;
