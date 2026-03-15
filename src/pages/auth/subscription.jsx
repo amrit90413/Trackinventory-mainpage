@@ -6,13 +6,11 @@ import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../composables/instance";
 import { useAuth } from "../../context/auth/useAuth";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "../../context/toast/ToastContext";
 
 export default function Subscription() {
   const auth = useAuth();
   const { token } = auth;
   const navigate = useNavigate();
-  const { showToast } = useToast();
 
   const selectedService = JSON.parse(
     localStorage.getItem("selectedService") || "{}"
@@ -96,7 +94,7 @@ export default function Subscription() {
         }
       } catch (err) {
         console.error("Subscription load error details:", err);
-        if (mounted) showToast("Unable to load subscription plans", "error");
+        if (mounted) alert("Unable to load subscription plans");
       }
     })();
 
@@ -114,7 +112,7 @@ export default function Subscription() {
 
   const applyPromoCode = async () => {
     if (!promoCode.trim() || !selectedPlan) {
-      showToast("Select a plan & enter promo code", "warning");
+      alert("Select a plan & enter promo code");
       return;
     }
     setPromoLoading(true);
@@ -129,7 +127,7 @@ export default function Subscription() {
         throw new Error("Invalid promo");
       }
     } catch {
-      showToast("Invalid promo code", "error");
+      alert("Invalid promo code");
       clearPromo();
     } finally {
       setPromoLoading(false);
@@ -142,8 +140,8 @@ export default function Subscription() {
 
   /* ---- payment ---- */
   const handleSubscribe = async () => {
-    if (!selectedPlan) return showToast("Please select a plan", "warning");
-    if (!token) return showToast("Please login first", "warning");
+    if (!selectedPlan) return alert("Please select a plan");
+    if (!token) return alert("Please login first");
 
     const payable = finalAmount > 0 ? finalAmount : selectedPlan.price;
 
@@ -177,10 +175,10 @@ export default function Subscription() {
               razorpayPaymentId: resp.razorpay_payment_id,
               razorpaySignature: resp.razorpay_signature,
             });
-            showToast("Payment successful 🎉 Subscription activated", "success");
+            alert("Payment successful 🎉 Subscription activated");
             navigate("/profile");
           } catch {
-            showToast("Payment verification failed", "error");
+            alert("Payment verification failed");
           }
         },
         theme: { color: "#EC4899" },
@@ -188,7 +186,7 @@ export default function Subscription() {
 
       new window.Razorpay(rzOptions).open();
     } catch {
-      showToast("Payment failed", "error");
+      alert("Payment failed");
     } finally {
       setSpinner(false);
     }

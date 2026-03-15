@@ -2,10 +2,6 @@ import { createBrowserRouter } from "react-router";
 import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
-import ContactUs from "../pages/conatctUs";
-import FaqPage from "../pages/faqPage";
-
-import DeleteAccount from "../pages/deleteAccount";
 import SignIn from "../pages/auth/signIn";
 import SignUp from "../pages/auth/signUp";
 import ForgotPassword from "../pages/auth/forgotPassword";
@@ -17,6 +13,7 @@ import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
 import PaymentHistory from "../pages/paymentHistory";
 import MobileList from "../components/MobileList";
+import DeleteAccount from "../pages/deleteAccount"; 
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -43,20 +40,12 @@ export const routes = createBrowserRouter([
     element: <TermsOfServices />,
   },
   {
-    path: "/delete-account",
-    element: <DeleteAccount />,
-  },
-  {
     path: "/privacy-policy",
     element: <PrivacyPolicy />,
   },
-  {
-    path: "/contact-us",
-    element: <ContactUs />,
-  },
-  {
-    path: "/faq",
-    element: <FaqPage />,
+    {
+    path: "/delete-account",
+    element: <DeleteAccount />,
   },
   {
     path:"/subscribe",
