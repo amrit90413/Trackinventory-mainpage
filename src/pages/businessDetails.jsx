@@ -89,14 +89,14 @@ const BusinessDetails = () => {
 
       if (response.status === 200) {
         const selectedCategory = categories.find(
-          (c) => c.id === data.category
+          (c) => (c.id || c.Id) === data.category
         );
 
         localStorage.setItem(
           "selectedService",
           JSON.stringify({
             id: data.category,
-            name: selectedCategory?.name,
+            name: selectedCategory?.name || selectedCategory?.Name,
           })
         );
 

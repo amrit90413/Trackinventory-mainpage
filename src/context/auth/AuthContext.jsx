@@ -49,7 +49,12 @@ export const AuthProvider = ({ children }) => {
     const fetchUserDetails = async () => {
       try {
         const { data } = await api.get("/User/GetUserDetails");
-        const resolvedUser = data?.data ?? data?.result ?? data;
+        let resolvedUser = data?.data ?? data?.result ?? data;
+
+        // Backend returns a List<UserDetailModel>, so we take the first element
+        if (Array.isArray(resolvedUser)) {
+          resolvedUser = resolvedUser[0];
+        }
 
         if (isActive && resolvedUser) {
           setAuthState((prev) => ({
