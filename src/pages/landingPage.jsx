@@ -173,6 +173,17 @@ const LandingPage = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 1, ease: "easeOut" }}
                 >
+                    <motion.h1
+                        className="text-4xl sm:text-6xl lg:text-7xl font-bold mb-8 leading-tight"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                    >
+                        Manage your <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400">
+                            Sales & Inventory Effortlessly
+                        </span>
+                    </motion.h1>
 
                     <motion.div
                         className="flex flex-col sm:flex-row gap-4 justify-center items-center"
