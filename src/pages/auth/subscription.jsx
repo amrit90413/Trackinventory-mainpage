@@ -27,57 +27,38 @@ export default function Subscription() {
 
   const [spinner, setSpinner] = useState(false);
 
-  /* ---- determine if guest (from mobile deep link) ---- */
-  const urlService = searchParams.get("service");    // e.g. ?service=Gold
-  const urlToken   = searchParams.get("token");      // optional token from app
+  const urlService = searchParams.get("service");
+  const urlToken   = searchParams.get("token");
   const isGuest    = !token && !urlToken;
 
-  /* ---- fetch plans ---- */
   useEffect(() => {
     let mounted = true;
 
-    // Priority: URL param > localStorage (from form) > user profile
     const serviceName =
       urlService ||
       selectedService?.name ||
       auth.user?.serviceName ||
       auth.user?.businessDetail?.[0]?.categoryName;
 
-    console.log("Subscription Check:", {
-      hasToken: !!token,
-      urlService,
-      localStorage: selectedService,
-      userProfile: auth.user,
-      discoveredName: serviceName,
-    });
-
     if (!serviceName) {
-      console.warn("No service name found");
       return;
     }
 
-    // If we have a URL token, Auto-auth is now handled globally in AuthContext before render.
-
     (async () => {
       try {
-        console.log(`[API REQUEST] Fetching plans for service: "${serviceName}"`);
         const { data: svc } = await api.post("Service/GetByName", null, {
           params: { name: serviceName },
           headers: urlToken ? { Authorization: `Bearer ${urlToken}` } : undefined,
         });
 
         if (!svc) {
-          console.error(`[API ERROR] Service "${serviceName}" not found in database`);
           return;
         }
 
-        // Handle both PascalCase and camelCase
         const sId = svc.id || svc.Id;
         const sName = svc.name || svc.Name || serviceName;
         const sOneYear = svc.oneYearPrice || svc.OneYearPrice || 0;
         const sTwoYear = svc.twoYearPrice || svc.TwoYearPrice || 0;
-
-        console.log("[API SUCCESS] Service data:", { sId, sName, sOneYear, sTwoYear });
 
         const plns = [];
         if (sOneYear > 0) {
@@ -100,12 +81,8 @@ export default function Subscription() {
         }
         if (mounted) {
           setPlans(plns);
-          if (plns.length === 0) {
-            console.warn("No plans found for prices > 0");
-          }
         }
       } catch (err) {
-        console.error("Subscription load error details:", err);
         if (mounted) alert("Unable to load subscription plans");
       }
     })();
@@ -115,7 +92,6 @@ export default function Subscription() {
     };
   }, [token, urlService, urlToken, selectedService?.name, auth.user?.businessDetail?.categoryName]);
 
-  /* ---- promo ---- */
   const clearPromo = () => {
     setDiscountAmount(0);
     setFinalAmount(0);
@@ -152,11 +128,9 @@ export default function Subscription() {
     clearPromo();
   }, [selectedPlan?.id]);
 
-  /* ---- payment ---- */
   const handleSubscribe = async () => {
     if (!selectedPlan) return alert("Please select a plan");
 
-    // Guest users must login first
     const effectiveToken = token || urlToken;
     if (!effectiveToken) {
       alert("Please login to your account first to subscribe.");
@@ -217,7 +191,6 @@ export default function Subscription() {
     }
   };
 
-  /* ---- skip ---- */
   const handleSkip = () => {
     navigate("/");
   };
@@ -229,13 +202,11 @@ export default function Subscription() {
           Subscribe now
         </h1>
 
-        {/* Play Store Compliant Notice */}
         <p className="text-center text-sm text-gray-500 mb-8 max-w-md mx-auto">
           Manage your Track Inventory subscription. Payments are processed
           securely via Razorpay on our website.
         </p>
 
-        {/* Guest login nudge */}
         {isGuest && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center">
             <p className="text-blue-800 text-sm mb-2">
@@ -324,7 +295,6 @@ export default function Subscription() {
           </Button>
         </div>
 
-        {/* ACTION BUTTONS */}
         <div className="text-center mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             variant="contained"

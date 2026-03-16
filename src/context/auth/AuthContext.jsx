@@ -10,9 +10,8 @@ const createInitialState = () => {
   const stored = getStoredAuth();
   
   if (urlToken && (!stored || stored.token !== urlToken)) {
-    // We found a token in the URL, treat it as the freshest login state immediately
     const newState = { token: urlToken, user: null };
-    persistAuth(newState); // Commit right away so api interceptors see it instantly
+    persistAuth(newState);
     return newState;
   }
 
@@ -62,7 +61,6 @@ export const AuthProvider = ({ children }) => {
         const { data } = await api.get("/User/GetUserDetails");
         let resolvedUser = data?.data ?? data?.result ?? data;
 
-        // Backend returns a List<UserDetailModel>, so we take the first element
         if (Array.isArray(resolvedUser)) {
           resolvedUser = resolvedUser[0];
         }
