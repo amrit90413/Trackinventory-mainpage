@@ -5,12 +5,13 @@ import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../composables/instance";
 import { useAuth } from "../../context/auth/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Subscription() {
   const auth = useAuth();
   const { token } = auth;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const selectedService = JSON.parse(
     localStorage.getItem("selectedService") || "{}"
@@ -26,32 +27,43 @@ export default function Subscription() {
 
   const [spinner, setSpinner] = useState(false);
 
+  /* ---- determine if guest (from mobile deep link) ---- */
+  const urlService = searchParams.get("service");    // e.g. ?service=Gold
+  const urlToken   = searchParams.get("token");      // optional token from app
+  const isGuest    = !token && !urlToken;
+
   /* ---- fetch plans ---- */
   useEffect(() => {
     let mounted = true;
 
-    // Priority: localStorage (from form) > user profile (top level) > user profile (nested)
-    const serviceName = selectedService?.name || auth.user?.serviceName || auth.user?.businessDetail?.[0]?.categoryName;
+    // Priority: URL param > localStorage (from form) > user profile
+    const serviceName =
+      urlService ||
+      selectedService?.name ||
+      auth.user?.serviceName ||
+      auth.user?.businessDetail?.[0]?.categoryName;
 
     console.log("Subscription Check:", {
       hasToken: !!token,
+      urlService,
       localStorage: selectedService,
       userProfile: auth.user,
-      discoveredName: serviceName
+      discoveredName: serviceName,
     });
 
-    if (!token) return;
-
     if (!serviceName) {
-      console.warn("No service name found in localStorage or user profile");
+      console.warn("No service name found");
       return;
     }
+
+    // If we have a URL token, Auto-auth is now handled globally in AuthContext before render.
 
     (async () => {
       try {
         console.log(`[API REQUEST] Fetching plans for service: "${serviceName}"`);
         const { data: svc } = await api.post("Service/GetByName", null, {
           params: { name: serviceName },
+          headers: urlToken ? { Authorization: `Bearer ${urlToken}` } : undefined,
         });
 
         if (!svc) {
@@ -101,7 +113,7 @@ export default function Subscription() {
     return () => {
       mounted = false;
     };
-  }, [token, selectedService?.name, auth.user?.businessDetail?.categoryName]);
+  }, [token, urlService, urlToken, selectedService?.name, auth.user?.businessDetail?.categoryName]);
 
   /* ---- promo ---- */
   const clearPromo = () => {
@@ -119,6 +131,8 @@ export default function Subscription() {
     try {
       const { data } = await api.post("/Promo/Apply", {
         code: promoCode.trim(),
+      }, {
+        headers: (token || urlToken) ? { Authorization: `Bearer ${token || urlToken}` } : undefined,
       });
       if (data.success) {
         setDiscountAmount(data.discountValue);
@@ -141,7 +155,14 @@ export default function Subscription() {
   /* ---- payment ---- */
   const handleSubscribe = async () => {
     if (!selectedPlan) return alert("Please select a plan");
-    if (!token) return alert("Please login first");
+
+    // Guest users must login first
+    const effectiveToken = token || urlToken;
+    if (!effectiveToken) {
+      alert("Please login to your account first to subscribe.");
+      navigate("/sign-in");
+      return;
+    }
 
     const payable = finalAmount > 0 ? finalAmount : selectedPlan.price;
 
@@ -159,7 +180,9 @@ export default function Subscription() {
         },
       };
 
-      const { data: rz } = await api.post("/Payment/initiate", payload);
+      const { data: rz } = await api.post("/Payment/initiate", payload, {
+        headers: { Authorization: `Bearer ${effectiveToken}` }
+      });
 
       const rzOptions = {
         key: rz.keyId,
@@ -174,6 +197,8 @@ export default function Subscription() {
               razorpayOrderId: resp.razorpay_order_id,
               razorpayPaymentId: resp.razorpay_payment_id,
               razorpaySignature: resp.razorpay_signature,
+            }, {
+              headers: { Authorization: `Bearer ${effectiveToken}` }
             });
             alert("Payment successful 🎉 Subscription activated");
             navigate("/profile");
@@ -200,9 +225,30 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-4xl">
-        <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
           Subscribe now
         </h1>
+
+        {/* Play Store Compliant Notice */}
+        <p className="text-center text-sm text-gray-500 mb-8 max-w-md mx-auto">
+          Manage your Track Inventory subscription. Payments are processed
+          securely via Razorpay on our website.
+        </p>
+
+        {/* Guest login nudge */}
+        {isGuest && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-blue-800 text-sm mb-2">
+              You are browsing as a guest. Please sign in to subscribe.
+            </p>
+            <button
+              onClick={() => navigate("/sign-in")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+            >
+              Sign In to Continue
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {plans.map((p) => {
@@ -256,6 +302,13 @@ export default function Subscription() {
           })}
         </div>
 
+        {plans.length === 0 && !isGuest && (
+          <div className="text-center py-12">
+            <CircularProgress size={32} />
+            <p className="text-gray-500 mt-4">Loading subscription plans...</p>
+          </div>
+        )}
+
         <div className="mt-8 flex gap-4 justify-center">
           <TextField
             label="Promo Code"
@@ -276,7 +329,7 @@ export default function Subscription() {
           <Button
             variant="contained"
             onClick={handleSubscribe}
-            disabled={spinner}
+            disabled={spinner || isGuest}
             className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-10 py-3"
           >
             {spinner ? (

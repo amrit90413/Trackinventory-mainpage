@@ -4,7 +4,18 @@ import api from "../../composables/instance";
 import { AuthContext } from "./context";
 
 const createInitialState = () => {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get("token");
+
   const stored = getStoredAuth();
+  
+  if (urlToken && (!stored || stored.token !== urlToken)) {
+    // We found a token in the URL, treat it as the freshest login state immediately
+    const newState = { token: urlToken, user: null };
+    persistAuth(newState); // Commit right away so api interceptors see it instantly
+    return newState;
+  }
+
   return {
     token: stored?.token ?? null,
     user: stored?.user ?? null,
