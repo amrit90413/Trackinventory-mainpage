@@ -4,7 +4,17 @@ import api from "../../composables/instance";
 import { AuthContext } from "./context";
 
 const createInitialState = () => {
+  const params = new URLSearchParams(window.location.search);
+  const urlToken = params.get("token");
+
   const stored = getStoredAuth();
+  
+  if (urlToken && (!stored || stored.token !== urlToken)) {
+    const newState = { token: urlToken, user: null };
+    persistAuth(newState);
+    return newState;
+  }
+
   return {
     token: stored?.token ?? null,
     user: stored?.user ?? null,
@@ -49,7 +59,11 @@ export const AuthProvider = ({ children }) => {
     const fetchUserDetails = async () => {
       try {
         const { data } = await api.get("/User/GetUserDetails");
-        const resolvedUser = data?.data ?? data?.result ?? data;
+        let resolvedUser = data?.data ?? data?.result ?? data;
+
+        if (Array.isArray(resolvedUser)) {
+          resolvedUser = resolvedUser[0];
+        }
 
         if (isActive && resolvedUser) {
           setAuthState((prev) => ({

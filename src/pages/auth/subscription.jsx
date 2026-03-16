@@ -5,11 +5,13 @@ import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
 import api from "../../composables/instance";
 import { useAuth } from "../../context/auth/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Subscription() {
-  const { token } = useAuth();
+  const auth = useAuth();
+  const { token } = auth;
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const selectedService = JSON.parse(
     localStorage.getItem("selectedService") || "{}"
@@ -25,36 +27,62 @@ export default function Subscription() {
 
   const [spinner, setSpinner] = useState(false);
 
-  /* ---- fetch plans ---- */
+  const urlService = searchParams.get("service");
+  const urlToken   = searchParams.get("token");
+  const isGuest    = !token && !urlToken;
+
   useEffect(() => {
     let mounted = true;
-    if (!token || !selectedService?.name) return;
+
+    const serviceName =
+      urlService ||
+      selectedService?.name ||
+      auth.user?.serviceName ||
+      auth.user?.businessDetail?.[0]?.categoryName;
+
+    if (!serviceName) {
+      return;
+    }
 
     (async () => {
       try {
-        const { data: svc } = await api.post("/Service/GetByName", null, {
-          params: { name: selectedService.name },
+        const { data: svc } = await api.post("Service/GetByName", null, {
+          params: { name: serviceName },
+          headers: urlToken ? { Authorization: `Bearer ${urlToken}` } : undefined,
         });
 
+        if (!svc) {
+          return;
+        }
+
+        const sId = svc.id || svc.Id;
+        const sName = svc.name || svc.Name || serviceName;
+        const sOneYear = svc.oneYearPrice || svc.OneYearPrice || 0;
+        const sTwoYear = svc.twoYearPrice || svc.TwoYearPrice || 0;
+
         const plns = [];
-        if (svc.oneYearPrice > 0) {
+        if (sOneYear > 0) {
           plns.push({
-            id: `${svc.id}-1Y`,
-            serviceName: svc.name,
-            price: svc.oneYearPrice,
+            id: `${sId}-1Y`,
+            serviceId: sId,
+            serviceName: sName,
+            price: sOneYear,
             duration: "1 Year",
           });
         }
-        if (svc.twoYearPrice > 0) {
+        if (sTwoYear > 0) {
           plns.push({
-            id: `${svc.id}-2Y`,
-            serviceName: svc.name,
-            price: svc.twoYearPrice,
+            id: `${sId}-2Y`,
+            serviceId: sId,
+            serviceName: sName,
+            price: sTwoYear,
             duration: "2 Years",
           });
         }
-        if (mounted) setPlans(plns);
-      } catch {
+        if (mounted) {
+          setPlans(plns);
+        }
+      } catch (err) {
         if (mounted) alert("Unable to load subscription plans");
       }
     })();
@@ -62,9 +90,8 @@ export default function Subscription() {
     return () => {
       mounted = false;
     };
-  }, [token, selectedService.name]);
+  }, [token, urlService, urlToken, selectedService?.name, auth.user?.businessDetail?.categoryName]);
 
-  /* ---- promo ---- */
   const clearPromo = () => {
     setDiscountAmount(0);
     setFinalAmount(0);
@@ -80,6 +107,8 @@ export default function Subscription() {
     try {
       const { data } = await api.post("/Promo/Apply", {
         code: promoCode.trim(),
+      }, {
+        headers: (token || urlToken) ? { Authorization: `Bearer ${token || urlToken}` } : undefined,
       });
       if (data.success) {
         setDiscountAmount(data.discountValue);
@@ -99,10 +128,15 @@ export default function Subscription() {
     clearPromo();
   }, [selectedPlan?.id]);
 
-  /* ---- payment ---- */
   const handleSubscribe = async () => {
     if (!selectedPlan) return alert("Please select a plan");
-    if (!token) return alert("Please login first");
+
+    const effectiveToken = token || urlToken;
+    if (!effectiveToken) {
+      alert("Please login to your account first to subscribe.");
+      navigate("/sign-in");
+      return;
+    }
 
     const payable = finalAmount > 0 ? finalAmount : selectedPlan.price;
 
@@ -110,7 +144,7 @@ export default function Subscription() {
     try {
       const payload = {
         orderId: "ORDER_" + Date.now(),
-        serviceId: selectedService.id,
+        serviceId: selectedPlan.serviceId || selectedService.id,
         planDuration: selectedPlan.duration === "1 Year" ? 1 : 2,
         amount: payable,
         promoCode: finalAmount > 0 ? promoCode.trim() : null,
@@ -120,7 +154,9 @@ export default function Subscription() {
         },
       };
 
-      const { data: rz } = await api.post("/Payment/initiate", payload);
+      const { data: rz } = await api.post("/Payment/initiate", payload, {
+        headers: { Authorization: `Bearer ${effectiveToken}` }
+      });
 
       const rzOptions = {
         key: rz.keyId,
@@ -135,6 +171,8 @@ export default function Subscription() {
               razorpayOrderId: resp.razorpay_order_id,
               razorpayPaymentId: resp.razorpay_payment_id,
               razorpaySignature: resp.razorpay_signature,
+            }, {
+              headers: { Authorization: `Bearer ${effectiveToken}` }
             });
             alert("Payment successful 🎉 Subscription activated");
             navigate("/profile");
@@ -153,7 +191,6 @@ export default function Subscription() {
     }
   };
 
-  /* ---- skip ---- */
   const handleSkip = () => {
     navigate("/");
   };
@@ -161,9 +198,28 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="w-full max-w-4xl">
-        <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl font-bold text-center mb-4 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
           Subscribe now
         </h1>
+
+        <p className="text-center text-sm text-gray-500 mb-8 max-w-md mx-auto">
+          Manage your Track Inventory subscription. Payments are processed
+          securely via Razorpay on our website.
+        </p>
+
+        {isGuest && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 text-center">
+            <p className="text-blue-800 text-sm mb-2">
+              You are browsing as a guest. Please sign in to subscribe.
+            </p>
+            <button
+              onClick={() => navigate("/sign-in")}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
+            >
+              Sign In to Continue
+            </button>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           {plans.map((p) => {
@@ -173,11 +229,10 @@ export default function Subscription() {
               <div
                 key={p.id}
                 onClick={() => setSelectedPlan(p)}
-                className={`cursor-pointer border rounded-2xl p-10 shadow-md transition-all ${
-                  isSel
+                className={`cursor-pointer border rounded-2xl p-10 shadow-md transition-all ${isSel
                     ? "border-pink-500 ring-2 ring-pink-300"
                     : "border-gray-200"
-                }`}
+                  }`}
               >
                 <h2 className="text-2xl font-semibold mb-2">
                   {p.serviceName}
@@ -218,6 +273,13 @@ export default function Subscription() {
           })}
         </div>
 
+        {plans.length === 0 && !isGuest && (
+          <div className="text-center py-12">
+            <CircularProgress size={32} />
+            <p className="text-gray-500 mt-4">Loading subscription plans...</p>
+          </div>
+        )}
+
         <div className="mt-8 flex gap-4 justify-center">
           <TextField
             label="Promo Code"
@@ -233,12 +295,11 @@ export default function Subscription() {
           </Button>
         </div>
 
-        {/* ACTION BUTTONS */}
         <div className="text-center mt-10 flex flex-col sm:flex-row gap-4 justify-center">
           <Button
             variant="contained"
             onClick={handleSubscribe}
-            disabled={spinner}
+            disabled={spinner || isGuest}
             className="bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 text-white px-10 py-3"
           >
             {spinner ? (
