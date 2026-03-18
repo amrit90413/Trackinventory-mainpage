@@ -4,10 +4,38 @@ import { useAuth } from '../context/auth/useAuth'
 import { parseJwtPayload } from '../common/storage'
 import './MobileList.css'
 
+function ProgressiveImage({ thumbSrc, fullSrc, alt }) {
+  const [src, setSrc] = useState(thumbSrc || fullSrc || '')
+
+  useEffect(() => {
+    setSrc(thumbSrc || fullSrc || '')
+  }, [thumbSrc, fullSrc])
+
+  useEffect(() => {
+    if (!fullSrc || fullSrc === src) return
+
+    let cancelled = false
+    const img = new Image()
+    img.src = fullSrc
+    img.onload = () => {
+      if (!cancelled) setSrc(fullSrc)
+    }
+    return () => {
+      cancelled = true
+    }
+  }, [fullSrc, src])
+
+  if (!src) return null
+  return <img src={src} alt={alt} loading="lazy" />
+}
+
 const mapApiItemToPhone = (item, index) => {
   const id = item?.id ?? item?.mobileId ?? index + 1
   const name = item?.name ?? item?.modelName ?? item?.title ?? `Phone Model ${id}`
-  const image = item?.image ?? item?.imageUrl ?? item?.thumbnail ?? `https://via.placeholder.com/300x420?text=Phone+${id}`
+  const media0 = Array.isArray(item?.mobileMedias) ? item.mobileMedias[0] : null
+  const imageThumb = media0?.thumb_100 || item?.thumbnail || item?.thumb_100
+  const imageFull = media0?.optimized || item?.image || item?.imageUrl || media0?.original
+  const image = imageThumb || imageFull || `https://via.placeholder.com/300x420?text=Phone+${id}`
   const batteryHealth = item?.batteryHealth ?? item?.health ?? item?.batteryHealthPercent
   const health = batteryHealth != null ? `${batteryHealth}% battery health` : `${80 + (index % 20)}% battery health`
   const ram = item?.ram ?? `${4 + (index % 4) * 2}GB`
@@ -19,7 +47,7 @@ const mapApiItemToPhone = (item, index) => {
   const warranty = item?.warranty ?? (index % 3 === 0 ? '6 months' : 'No warranty')
   const seller = item?.seller ?? item?.sellerName ?? item?.vendor ?? `Seller ${(index % 8) + 1}`
   const color = item?.color ?? item?.colour ?? ['Midnight', 'Coral', 'Ocean', 'Pearl'][index % 4]
-  return { id, name, image, health, other, price, condition, warranty, seller, color }
+  return { id, name, image, imageThumb, imageFull, health, other, price, condition, warranty, seller, color }
 }
 
 export default function MobileList() {
@@ -66,14 +94,14 @@ export default function MobileList() {
         const payload = {
           skip: 0,
           take: 100,
-          dateFilter: 0,
+          dateFilter: null,
           customStartDate: new Date().toISOString(),
           customEndDate: new Date().toISOString(),
           sortBy: '',
           UserId: userId,
         }
         const { data } = await api.post('/Mobile/GetAllInventoryMobilesByUser', payload)
-        const raw = data?.data ?? data?.items ?? data?.result ?? data
+        const raw = data?.data ?? data?.items ?? data?.result ?? data.mobiles
         const list = Array.isArray(raw) ? raw : []
         if (!cancelled) {
           setPhones(list.map((item, i) => mapApiItemToPhone(item, i)))
@@ -132,7 +160,11 @@ export default function MobileList() {
           <article key={phone.id} className={`mobile-card ${expanded === phone.id ? 'expanded' : ''}`}> 
             <div className="mobile-card-main">
               <div className="mobile-image">
-                <img src={phone.image} alt={phone.name} />
+                <ProgressiveImage
+                  thumbSrc={phone.imageThumb || phone.image}
+                  fullSrc={phone.imageFull || phone.image}
+                  alt={phone.name}
+                />
               </div>
               <div className="mobile-info">
                 <div className="info-top">
