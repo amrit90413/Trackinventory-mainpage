@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-new.jpg';
-import { AccountCircle, Lock, Person, Logout, Payment } from '@mui/icons-material';
+import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 
 const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
@@ -12,6 +12,7 @@ const navItems = [
   { id: 'introduction', label: 'Introduction' },
   { id: 'how-it-works', label: 'How It Works' },
   { id: 'faqs', label: 'FAQs' },
+  { id: 'sign-up', label: 'Sign-up' }
 ];
 
 const Header = () => {
@@ -22,7 +23,6 @@ const Header = () => {
   const [showTrialBanner, setShowTrialBanner] = useState(false);
   const [showTrialModal, setShowTrialModal] = useState(false);
   const [showTrialTooltip, setShowTrialTooltip] = useState(false);
-
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, user, token } = useAuth();
@@ -87,15 +87,20 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isUserMenuOpen]);
 
-  const handleNavClick = (id) => {
+  const handleNavClick = (sectionId) => {
     setIsMenuOpen(false);
 
-    if (location.pathname !== '/') {
-      navigate(`/?scroll=${id}`);
+    if (sectionId === 'sign-up') {
+      navigate('/sign-up');
       return;
     }
 
-    const el = document.getElementById(id);
+    if (location.pathname !== '/') {
+      navigate(`/?scroll=${sectionId}`);
+      return;
+    }
+
+    const el = document.getElementById(sectionId);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -104,6 +109,8 @@ const Header = () => {
   const handleUserMenuClick = (action) => {
     if (action === 'profile') {
       navigate('/profile');
+    } else if (action === 'signup') {
+      navigate('/sign-up');
     } else if (action === 'changePassword') {
       navigate('/change-password');
     } else if (action === 'paymentHistory') {
@@ -115,7 +122,6 @@ const Header = () => {
     setIsUserMenuOpen(false);
     setIsMenuOpen(false);
   };
-
   const NavLink = ({ item, index, mobile }) => (
     <motion.a
       key={item.id}
@@ -139,15 +145,13 @@ const Header = () => {
       )}
     </motion.a>
   );
-
   const CTAButton = ({ mobile }) => (
     <motion.button
       className={`group ${gradientClass} ${hoverGradient} text-white ${mobile ? 'w-full text-base py-3' : 'text-sm px-6 py-2'} rounded-full font-semibold transition-all duration-300`}
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={() => navigate('/contact-us')}
     >
-      <span className="flex items-center justify-center gap-2">
+      <span className="flex items-center justify-center gap-2" onClick={() => navigate('/contact-us')}>
         Contact Us
         <motion.svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" whileHover={{ x: 3 }}>
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
@@ -181,71 +185,74 @@ const Header = () => {
             />
           </motion.h1>
           <nav className="hidden md:flex items-center space-x-6">
+            {/* Trial gift icon with hover / focus tooltip */}
             {showTrialBanner && trialMessage && (
-                <div
-                  className="relative"
-                  onMouseEnter={() => setShowTrialTooltip(true)}
-                  onMouseLeave={() => setShowTrialTooltip(false)}
+              <div
+                className="relative"
+                onMouseEnter={() => setShowTrialTooltip(true)}
+                onMouseLeave={() => setShowTrialTooltip(false)}
+              >
+                <motion.button
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-md border border-white/70"
+                  animate={{ rotate: [0, -10, 10, 0] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  <motion.button
-                    className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-md border border-white/70"
-                    animate={{ rotate: [0, -10, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <span className="text-2xl">🎁</span>
-                  </motion.button>
+                  <span className="text-2xl">🎁</span>
+                </motion.button>
 
-                  <AnimatePresence>
-                    {showTrialTooltip && (
-                      <motion.div
-                        className="absolute left-1/2 z-40 mt-3 w-72 -translate-x-1/2"
-                        initial={{ opacity: 0, y: -4 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -4 }}
-                        transition={{ duration: 0.15 }}
-                      >
-                        <div className="rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-2xl px-4 py-3">
-                          <div className="flex items-start gap-3">
-                            <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 shadow-inner shrink-0">
-                              <span className="text-lg">🎁</span>
-                            </div>
-                            <div className="space-y-1 text-left">
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/80">
-                                Trial status
-                              </p>
-                              <p className="text-xs sm:text-sm leading-snug">
-                                {trialMessage}
-                              </p>
-                              <button
-                                className="mt-1 inline-flex items-center text-[15px] font-semibold text-white underline decoration-white/70 hover:decoration-white"
-                                onClick={() => navigate('/subscribe')}
-                              >
-                                View plans
-                              </button>
-                            </div>
+                {/* Tooltip box shown while hovering the gift icon or tooltip */}
+                <AnimatePresence>
+                  {showTrialTooltip && (
+                    <motion.div
+                      className="absolute left-1/2 z-40 mt-3 w-72 -translate-x-1/2"
+                      initial={{ opacity: 0, y: -4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -4 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      <div className="rounded-2xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-2xl px-4 py-3">
+                        <div className="flex items-start gap-3">
+                          <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-full bg-white/15 shadow-inner shrink-0">
+                            <span className="text-lg">🎁</span>
+                          </div>
+                          <div className="space-y-1 text-left">
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/80">
+                              Trial status
+                            </p>
+                            <p className="text-xs sm:text-sm leading-snug">
+                              {trialMessage}
+                            </p>
+                            <button
+                              className="mt-1 inline-flex items-center text-[15px] font-semibold text-white underline decoration-white/70 hover:decoration-white"
+                              onClick={() => navigate('/subscribe')}
+                            >
+                              View plans
+                            </button>
                           </div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
 
-            {navItems.map((item, index) => <NavLink key={index} item={item} index={index} />)}
-            
-            <motion.a
-              onClick={() => navigate('/mobiles')}
-              className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
-              whileHover={{ y: -2 }}
-            >
-              <span>Mobiles</span>
-            </motion.a>
-
-            {!isLoggedIn ? (
-              <CTAButton />
-            ) : (
+            {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} />)}
+            {isLoggedIn && (
+              <motion.a
+                onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }}
+                className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ y: -2 }}
+              >
+                <span>Mobiles</span>
+              </motion.a>
+            )}
+          {isLoggedIn && (
+            <div className="hidden md:flex items-center space-x-4">
               <div className="relative user-menu-container">
                 <motion.button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
@@ -297,7 +304,8 @@ const Header = () => {
                   )}
                 </AnimatePresence>
               </div>
-            )}
+            </div>
+          )}
           </nav>
           <div className="md:hidden">
             <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
@@ -309,6 +317,9 @@ const Header = () => {
             </motion.button>
           </div>
         </div>
+
+        {/* No full-width banner now; trial status is shown via the gift tooltip icon in the nav */}
+
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div
@@ -320,26 +331,61 @@ const Header = () => {
             >
               <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200/50">
                 {showTrialBanner && trialMessage && (
-                  <div className="mb-3 p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-lg">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">🎁</span>
-                      <div className="text-left">
-                        <p className="text-xs leading-snug">{trialMessage}</p>
-                        <button onClick={() => { setIsMenuOpen(false); navigate('/subscribe'); }} className="text-xs font-semibold underline mt-1 whitespace-nowrap">View plans →</button>
+                  <div
+                    className="mb-3 p-3 rounded-xl bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-500 text-white shadow-lg"
+                    onClick={() => { setIsMenuOpen(false); navigate('/subscribe'); }}
+                  >
+                    <div className="flex items-center gap-3 cursor-pointer">
+                      <motion.span
+                        className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 text-3xl shrink-0"
+                        animate={{ rotate: [0, -10, 10, 0] }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                      >
+                        🎁
+                      </motion.span>
+                      <div className="flex-1 min-w-0 text-left">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/80">Trial status</p>
+                        <p className="text-xs leading-snug mt-0.5">{trialMessage}</p>
+                        <span className="text-sm font-semibold underline mt-1 inline-block">View plans →</span>
                       </div>
                     </div>
                   </div>
                 )}
-                {navItems.map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
-                <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
-                {!isLoggedIn ? (
-                  <div className="pt-4"><CTAButton mobile /></div>
-                ) : (
+                {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
+                {isLoggedIn && (
+                  <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
+                )}
+                {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">
-                    <button onClick={() => handleUserMenuClick('profile')} className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 flex items-center space-x-2 rounded-lg"><Person sx={{ fontSize: 20 }} /><span>Manage Profile</span></button>
-                    <button onClick={() => handleUserMenuClick('paymentHistory')} className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 flex items-center space-x-2 rounded-lg"><Payment sx={{ fontSize: 20 }} /><span>Payment History</span></button>
-                    <button onClick={() => handleUserMenuClick('changePassword')} className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 flex items-center space-x-2 rounded-lg"><Lock sx={{ fontSize: 20 }} /><span>Change Password</span></button>
-                    <button onClick={() => handleUserMenuClick('logout')} className="w-full text-left px-3 py-3 text-gray-700 hover:bg-red-50 flex items-center space-x-2 rounded-lg"><Logout sx={{ fontSize: 20 }} /><span>Logout</span></button>
+                    <button
+                      onClick={() => handleUserMenuClick('profile')}
+                      className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                    >
+                      <Person sx={{ fontSize: 20 }} />
+                      <span>Manage Profile</span>
+                    </button>
+                    <button
+                      onClick={() => handleUserMenuClick('paymentHistory')}
+                      className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                    >
+                      <Payment sx={{ fontSize: 20 }} />
+                      <span>Payment History</span>
+                    </button>
+                   
+                    <button
+                      onClick={() => handleUserMenuClick('changePassword')}
+                      className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                    >
+                      <Lock sx={{ fontSize: 20 }} />
+                      <span>Change Password</span>
+                    </button>
+                    <button
+                      onClick={() => handleUserMenuClick('logout')}
+                      className="w-full text-left px-3 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"
+                    >
+                      <Logout sx={{ fontSize: 20 }} />
+                      <span>Logout</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -348,6 +394,7 @@ const Header = () => {
         </AnimatePresence>
       </div>
 
+      {/* Trial expired modal (blocking) */}
       <AnimatePresence>
         {showTrialModal && trialMessage && (
           <motion.div
@@ -363,16 +410,26 @@ const Header = () => {
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">Trial Period Completed</h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                Trial Period Completed
+              </h2>
               <p className="text-sm text-gray-700">{trialMessage}</p>
               <div className="mt-4 flex flex-col sm:flex-row gap-3 justify-center">
                 <button
                   className="px-4 py-2 rounded-full text-sm font-semibold text-white bg-gradient-to-r from-pink-500 to-indigo-500 hover:from-pink-600 hover:to-indigo-600 shadow-md"
-                  onClick={() => { setShowTrialModal(false); navigate('/subscribe'); }}
+                  onClick={() => {
+                    setShowTrialModal(false);
+                    navigate('/subscribe');
+                  }}
                 >
                   Subscribe now
                 </button>
-                <button className="px-4 py-2 rounded-full text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200" onClick={() => setShowTrialModal(false)}>Close</button>
+                <button
+                  className="px-4 py-2 rounded-full text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200"
+                  onClick={() => setShowTrialModal(false)}
+                >
+                  Close
+                </button>
               </div>
             </motion.div>
           </motion.div>
@@ -381,4 +438,4 @@ const Header = () => {
     </motion.header>
   );
 };
-export default Header;
+export default Header;

@@ -12,7 +12,7 @@ import ForgotPassword from "../pages/auth/forgotPassword";
 import BusinessDetails from "../pages/businessDetails";
 import OtpVerify from "../pages/auth/otpVerify";
 import PrivateRoute from "../PrivateRoute";
-import Subscription from "../pages/auth/subscription";
+import Subscription from "../pages/subscription";
 import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
 import PaymentHistory from "../pages/paymentHistory";
@@ -92,7 +92,19 @@ export const routes = createBrowserRouter([
   },
   {
     path: "/mobiles",
-    element: <MobileList/>,
+    element: (
+      <PrivateRoute>
+        <MobileList />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: "/websitename",
+    element: (
+      <PrivateRoute>
+        <MobileList />
+      </PrivateRoute>
+    ),
   },
 ]);
 
