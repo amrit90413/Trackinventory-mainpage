@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Button, TextField } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import CircularProgress from "@mui/material/CircularProgress";
-import api from "../../composables/instance";
-import { useAuth } from "../../context/auth/useAuth";
+import api from "../composables/instance";
+import { useAuth } from "../context/auth/useAuth";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Subscription() {
@@ -83,7 +82,9 @@ export default function Subscription() {
           setPlans(plns);
         }
       } catch (err) {
-        if (mounted) alert("Unable to load subscription plans");
+        if (mounted) {
+          showToast("Unable to load subscription plans", "error");
+        }
       }
     })();
 

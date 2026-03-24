@@ -240,15 +240,17 @@ const Header = () => {
             )}
 
             {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} />)}
-            <motion.a
-              onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }}
-              className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              whileHover={{ y: -2 }}
-            >
-              <span>Mobiles</span>
-            </motion.a>
+            {isLoggedIn && (
+              <motion.a
+                onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }}
+                className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                whileHover={{ y: -2 }}
+              >
+                <span>Mobiles</span>
+              </motion.a>
+            )}
           {isLoggedIn && (
             <div className="hidden md:flex items-center space-x-4">
               <div className="relative user-menu-container">
@@ -350,7 +352,9 @@ const Header = () => {
                   </div>
                 )}
                 {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
-                <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
+                {isLoggedIn && (
+                  <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
+                )}
                 {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">
                     <button
