@@ -29,11 +29,11 @@ const Header = () => {
   const isLoggedIn = Boolean(token);
   const resolvedUser = Array.isArray(user) ? user[0] : user;
 
-const websiteName =
-  resolvedUser?.bussinessDetail?.[0]?.websiteName || "default";
+  const websiteName =
+    resolvedUser?.bussinessDetail?.[0]?.websiteName || "default";
 
-const mobileUrl = `https://trackinventory.in/${websiteName}`;
-console.log("websiteName:", websiteName);  
+  const mobileUrl = `https://trackinventory.in/${websiteName}`;
+  console.log("websiteName:", websiteName);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
@@ -247,71 +247,71 @@ console.log("websiteName:", websiteName);
 
             {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} />)}
             {isLoggedIn && (
-  <motion
-    onClick={() => {
-      setIsMenuOpen(false);
-      navigate(`/${websiteName}`);
-    }}
-    className="group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300"
-  >
-    <span>Mobiles</span>
-  </motion>
-)}
-          {isLoggedIn && (
-            <div className="hidden md:flex items-center space-x-4">
-              <div className="relative user-menu-container">
-                <motion.button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-300"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <AccountCircle sx={{ fontSize: 40 }} />
-                </motion.button>
+              <motion
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate(`/${websiteName}`);
+                }}
+                className="group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300"
+              >
+                <span>Mobiles</span>
+              </motion>
+            )}
+            {isLoggedIn && (
+              <div className="hidden md:flex items-center space-x-4">
+                <div className="relative user-menu-container">
+                  <motion.button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center space-x-2 text-gray-700 hover:text-pink-600 transition-colors duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <AccountCircle sx={{ fontSize: 40 }} />
+                  </motion.button>
 
-                <AnimatePresence>
-                  {isUserMenuOpen && (
-                    <motion.div
-                      className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <button
-                        onClick={() => handleUserMenuClick('profile')}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                  <AnimatePresence>
+                    {isUserMenuOpen && (
+                      <motion.div
+                        className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
                       >
-                        <Person sx={{ fontSize: 20 }} />
-                        <span>Manage Profile</span>
-                      </button>
-                      <button
-                        onClick={() => handleUserMenuClick('paymentHistory')}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
-                      >
-                        <Payment sx={{ fontSize: 20 }} />
-                        <span>Payment History</span>
-                      </button>
-                      <button
-                        onClick={() => handleUserMenuClick('changePassword')}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
-                      >
-                        <Lock sx={{ fontSize: 20 }} />
-                        <span>Change Password</span>
-                      </button>
-                      <button
-                        onClick={() => handleUserMenuClick('logout')}
-                        className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
-                      >
-                        <Logout sx={{ fontSize: 20 }} />
-                        <span>Logout</span>
-                      </button>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                        <button
+                          onClick={() => handleUserMenuClick('profile')}
+                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                        >
+                          <Person sx={{ fontSize: 20 }} />
+                          <span>Manage Profile</span>
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuClick('paymentHistory')}
+                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                        >
+                          <Payment sx={{ fontSize: 20 }} />
+                          <span>Payment History</span>
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuClick('changePassword')}
+                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                        >
+                          <Lock sx={{ fontSize: 20 }} />
+                          <span>Change Password</span>
+                        </button>
+                        <button
+                          onClick={() => handleUserMenuClick('logout')}
+                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-red-50 hover:text-red-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
+                        >
+                          <Logout sx={{ fontSize: 20 }} />
+                          <span>Logout</span>
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </div>
-            </div>
-          )}
+            )}
           </nav>
           <div className="md:hidden">
             <motion.button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-700 hover:text-pink-600">
@@ -359,15 +359,15 @@ console.log("websiteName:", websiteName);
                 )}
                 {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
                 <motion.a
-  onClick={() => {
-    setIsMenuOpen(false);
-    navigate(`/${websiteName}`);
-  }}
-  className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-medium cursor-pointer"
-  whileHover={{ x: 10 }}
->
-  Mobiles
-</motion.a>
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate(`/${websiteName}`);
+                  }}
+                  className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-medium cursor-pointer"
+                  whileHover={{ x: 10 }}
+                >
+                  Mobiles
+                </motion.a>
                 {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">
                     <button
@@ -384,7 +384,7 @@ console.log("websiteName:", websiteName);
                       <Payment sx={{ fontSize: 20 }} />
                       <span>Payment History</span>
                     </button>
-                   
+
                     <button
                       onClick={() => handleUserMenuClick('changePassword')}
                       className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"

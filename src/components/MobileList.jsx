@@ -116,7 +116,6 @@ const itemsPerPage = 6
           sortBy: "",
           userId: websiteUserId,
         };
-
         const res = await api.post(
           "/Mobile/GetAllInventoryMobilesByUser",
           payload
@@ -135,13 +134,11 @@ const itemsPerPage = 6
         } else {
           raw = [];
         }
-
         if (!cancelled) {
           setPhones(raw.map((item, i) => mapApiItemToPhone(item, i)));
         }
       } catch (err) {
         console.error(err);
-
         if (!cancelled) {
           setPhones([]);
           setError(
