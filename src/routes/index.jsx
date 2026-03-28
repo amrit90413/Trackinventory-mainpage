@@ -88,12 +88,8 @@ export const routes = createBrowserRouter([
     ),
   },
   {
-    path: "/websitename",
-    element: (
-      <PrivateRoute>
-        <MobileList />
-      </PrivateRoute>
-    ),
-  },
+    path: "/:websiteName",
+    element: <MobileList />,
+  }
 ]);
 

@@ -67,7 +67,7 @@ const BusinessDetails = () => {
         id: -1,
         CategoryId: data.category,
         Name: data.businessName,
-        WebsiteName: "",
+        WebsiteName: data.websiteName,
         MobileNumber: "",
         Address1: data.address1,
         Address2: data.address2 || "",
@@ -162,6 +162,28 @@ const BusinessDetails = () => {
               </p>
             )}
           </div>
+
+{/* WEBSITE NAME */}
+<div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">
+    Website Name <span className="text-red-500">*</span>
+  </label>
+
+  <input
+    type="text"
+    {...register("websiteName", {
+      required: "Website Name is required",
+    })}
+    className="w-full px-4 py-3 rounded-lg border border-gray-300 shadow-sm focus:ring-2 focus:ring-pink-500 focus:outline-none"
+    placeholder="Enter website name (e.g. myshop)"
+  />
+
+  {errors.websiteName && (
+    <p className="text-red-500 text-sm mt-1">
+      {errors.websiteName.message}
+    </p>
+  )}
+</div>
 
           {/* COUNTRY */}
           <div>

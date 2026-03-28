@@ -27,7 +27,13 @@ const Header = () => {
   const location = useLocation();
   const { logout, user, token } = useAuth();
   const isLoggedIn = Boolean(token);
+  const resolvedUser = Array.isArray(user) ? user[0] : user;
 
+const websiteName =
+  resolvedUser?.bussinessDetail?.[0]?.websiteName || "default";
+
+const mobileUrl = `https://trackinventory.in/${websiteName}`;
+console.log("websiteName:", websiteName);  
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll);
@@ -241,16 +247,16 @@ const Header = () => {
 
             {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} />)}
             {isLoggedIn && (
-              <motion.a
-                onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }}
-                className={`group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300`}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                whileHover={{ y: -2 }}
-              >
-                <span>Mobiles</span>
-              </motion.a>
-            )}
+  <motion
+    onClick={() => {
+      setIsMenuOpen(false);
+      navigate(`/${websiteName}`);
+    }}
+    className="group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300"
+  >
+    <span>Mobiles</span>
+  </motion>
+)}
           {isLoggedIn && (
             <div className="hidden md:flex items-center space-x-4">
               <div className="relative user-menu-container">
@@ -352,9 +358,12 @@ const Header = () => {
                   </div>
                 )}
                 {navItems.filter((item) => item.id !== 'sign-up' || !isLoggedIn).map((item, index) => <NavLink key={index} item={item} index={index} mobile />)}
-                {isLoggedIn && (
-                  <a onClick={() => { setIsMenuOpen(false); navigate('/mobiles') }} className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600">Mobiles</a>
-                )}
+                <a
+  onClick={() => {
+    setIsMenuOpen(false);
+    navigate(`/${websiteName}`);
+  }}
+></a>
                 {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">
                     <button

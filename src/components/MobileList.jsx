@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useParams } from "react-router-dom";
 import api from '../composables/instance'
 import { useAuth } from '../context/auth/useAuth'
 import { parseJwtPayload } from '../common/storage'
@@ -51,6 +52,7 @@ const mapApiItemToPhone = (item, index) => {
 }
 
 export default function MobileList() {
+  const { websiteName } = useParams();
   const { user, token } = useAuth()
   const [phones, setPhones] = useState([])
   const [loading, setLoading] = useState(true)
@@ -65,60 +67,90 @@ export default function MobileList() {
   const userId = fromUser || fromJwt
 
   useEffect(() => {
-    // Require auth token; without it we can't call the mobiles API
-    if (!token) {
-      setLoading(false)
-      setError('Please sign in to view mobiles.')
-      setPhones([])
-      return
-    }
-
-    // Wait until user details have been fetched by AuthContext
-    if (token && !user) {
-      return
-    }
-
-    if (!userId) {
-      setLoading(false)
-      setError('Unable to load user. Please sign in again.')
-      setPhones([])
-      return
-    }
-
-    let cancelled = false
-
+    if (!websiteName) return;
+  
+    let cancelled = false;
+  
     const fetchMobiles = async () => {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
+  
       try {
+        const cleanWebsite = websiteName.toUpperCase();
+  
+        // ✅ STEP 1: Get userId
+        const userRes = await api.get(
+          `/User/GetUserId?websiteName=${encodeURIComponent(cleanWebsite)}`
+        );
+  
+        const websiteUserId =
+          userRes?.data?.userId ??
+          userRes?.data?.data?.userId;
+  
+        if (!websiteUserId) {
+          throw new Error("Website not found");
+        }
+  
+        // ✅ STEP 2: Fetch mobiles
         const payload = {
           skip: 0,
           take: 100,
           dateFilter: null,
           customStartDate: new Date().toISOString(),
           customEndDate: new Date().toISOString(),
-          sortBy: '',
-          UserId: userId,
+          sortBy: "",
+          userId: websiteUserId,
+        };
+  
+        const res = await api.post(
+          "/Mobile/GetAllInventoryMobilesByUser",
+          payload
+        );
+  
+        console.log("FULL RESPONSE:", res.data);
+  
+        // ✅ SAFE extraction (handles all cases)
+        let raw = [];
+  
+        if (Array.isArray(res?.data)) {
+          raw = res.data;
+        } else if (Array.isArray(res?.data?.mobiles)) {
+          raw = res.data.mobiles;
+        } else if (Array.isArray(res?.data?.data)) {
+          raw = res.data.data;
+        } else if (Array.isArray(res?.data?.data?.mobiles)) {
+          raw = res.data.data.mobiles;
+        } else {
+          raw = [];
         }
-        const { data } = await api.post('/Mobile/GetAllInventoryMobilesByUser', payload)
-        const raw = data?.data ?? data?.items ?? data?.result ?? data.mobiles
-        const list = Array.isArray(raw) ? raw : []
+  
+        console.log("EXTRACTED:", raw);
+  
         if (!cancelled) {
-          setPhones(list.map((item, i) => mapApiItemToPhone(item, i)))
+          setPhones(raw.map((item, i) => mapApiItemToPhone(item, i)));
         }
       } catch (err) {
+        console.error(err);
+  
         if (!cancelled) {
-          setError(err?.response?.data?.message ?? err?.message ?? 'Failed to load mobiles')
-          setPhones([])
+          setPhones([]);
+          setError(
+            err?.response?.data?.message ||
+            err?.message ||
+            "No mobiles found for this website."
+          );
         }
       } finally {
-        if (!cancelled) setLoading(false)
+        if (!cancelled) setLoading(false);
       }
-    }
-
-    fetchMobiles()
-    return () => { cancelled = true }
-  }, [token, user, userId])
+    };
+  
+    fetchMobiles();
+  
+    return () => {
+      cancelled = true;
+    };
+  }, [websiteName]);
 
   const toggle = (id) => setExpanded((prev) => (prev === id ? null : id))
 
