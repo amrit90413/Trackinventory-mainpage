@@ -27,11 +27,7 @@
 .info-actions{display:flex; align-items:center; gap:12px; margin-top:10px}
 .price-block{position:relative}
 .blurred-price{filter:blur(6px); -webkit-filter:blur(6px); color:#111827; font-weight:800; font-size:1.05rem; padding:6px 10px; display:inline-block}
-<<<<<<< HEAD
-.view-price-btn{position:absolute; right:-6px; top:50%; transform:translateY(-50%); background:linear-gradient(90deg,#7c3aed,#ec4899); color:white; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:700; font-size:0.85rem; box-shadow:0 6px 18px rgba(124,58,237,0.18)}
-=======
 .view-price-btn{position:relative; right:-6px; top:50%; transform:translateY(-50%); background:linear-gradient(90deg,#7c3aed,#ec4899); color:white; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:700; font-size:0.85rem; box-shadow:0 6px 18px rgba(124,58,237,0.18)}
->>>>>>> 3a71bac (Added pagination)
 .view-price-btn:hover{opacity:0.95}
 
 .expand-btn{background:transparent; border:none; display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:8px; color:#374151; cursor:pointer; transition:transform .15s ease, background .12s}
@@ -44,33 +40,28 @@
 .details-actions{display:flex; gap:10px; margin-top:12px}
 .contact-btn{background:linear-gradient(90deg,#10b981,#06b6d4); color:white; padding:8px 12px; border-radius:8px; text-decoration:none; font-weight:700}
 .close-details{background:transparent; border:1px solid #e5e7eb; padding:8px 12px; border-radius:8px; cursor:pointer}
-<<<<<<< HEAD
-
-=======
 .pagination {
-  display: flex;
+  display: flex !important;
+  flex-direction: row !important;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
   list-style: none;
   gap: 8px;
-  padding: 0;
+}
+
+.pagination li {
+  display: flex !important;
+  flex-direction: row !important;
 }
 
 .page-item {
+  display: inline-block;
   padding: 6px 12px;
   border: 1px solid #ddd;
   cursor: pointer;
   border-radius: 6px;
 }
-
-.page-item:hover {
-  background: #f3f4f6;
-}
-
-.active {
-  background: #111827;
-  color: white;
-  border-color: #111827;
-}
->>>>>>> 3a71bac (Added pagination)
 @media (max-width:900px){
   .mobile-list-wrapper{padding:24px}
   .mobile-image img{width:110px; height:140px}

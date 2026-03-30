@@ -39,6 +39,7 @@ const mapApiItemToPhone = (item, index) => {
   const imageFull = media0?.optimized || item?.image || item?.imageUrl || media0?.original
   const image = imageThumb || imageFull || `https://via.placeholder.com/300x420?text=Phone+${id}`
   const batteryHealth = item?.batteryHealth
+
   const storage = item?.storage ?? item?.storageGb ?? `${64 + (index % 3) * 64}GB`
   const os = item?.os ?? item?.operatingSystem ?? 'Android'
   const other = `${storage} storage • ${os}`
@@ -56,28 +57,26 @@ const mapApiItemToPhone = (item, index) => {
 }
 
 export default function MobileList() {
-  const [currentPage, setCurrentPage] = useState(0)
-const itemsPerPage = 6
   const { websiteName } = useParams();
   const { user, token } = useAuth()
+
   const [phones, setPhones] = useState([])
   const [mobileNumber, setMobileNumber] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [expanded, setExpanded] = useState(null)
 
-  const u = Array.isArray(user) ? user[0] : user
-  const fromUser = u?.userId ?? u?.UserId ?? u?.id ?? u?.Id ?? ''
-  const jwt = parseJwtPayload(token)
-  const fromJwt = jwt?.sub ?? jwt?.userId ?? jwt?.UserId ?? jwt?.nameid ?? ''
-  const userId = fromUser || fromJwt
-  const offset = currentPage * itemsPerPage
-  const currentPhones = phones.slice(offset, offset + itemsPerPage)
-  const pageCount = Math.ceil(phones.length / itemsPerPage)
-  
+  // ✅ Pagination state
+  const [currentPage, setCurrentPage] = useState(0)
+  const [totalCount, setTotalCount] = useState(0)
+  const itemsPerPage = 12
+
+  const pageCount = Math.ceil(totalCount / itemsPerPage)
+
   const handlePageClick = (event) => {
     setCurrentPage(event.selected)
   }
+
   useEffect(() => {
     if (!websiteName) return;
 
@@ -89,6 +88,8 @@ const itemsPerPage = 6
 
       try {
         const cleanWebsite = websiteName.toUpperCase();
+
+        // ✅ Get userId + mobile number
         const userRes = await api.get(
           `/User/GetUserId?websiteName=${encodeURIComponent(cleanWebsite)}`
         );
@@ -107,15 +108,17 @@ const itemsPerPage = 6
           throw new Error("Website not found");
         }
 
+        // ✅ API pagination
         const payload = {
-          skip: 0,
-          take: 100,
+          skip: currentPage * itemsPerPage,
+          take: itemsPerPage,
           dateFilter: null,
           customStartDate: new Date().toISOString(),
           customEndDate: new Date().toISOString(),
           sortBy: "",
           userId: websiteUserId,
         };
+
         const res = await api.post(
           "/Mobile/GetAllInventoryMobilesByUser",
           payload
@@ -131,14 +134,22 @@ const itemsPerPage = 6
           raw = res.data.data;
         } else if (Array.isArray(res?.data?.data?.mobiles)) {
           raw = res.data.data.mobiles;
-        } else {
-          raw = [];
         }
+
+        // ✅ Total count (IMPORTANT)
+        const total =
+          res?.data?.totalCount ??
+          res?.data?.data?.totalCount ??
+          raw.length;
+
         if (!cancelled) {
           setPhones(raw.map((item, i) => mapApiItemToPhone(item, i)));
+          setTotalCount(total);
         }
+
       } catch (err) {
         console.error(err);
+
         if (!cancelled) {
           setPhones([]);
           setError(
@@ -157,7 +168,7 @@ const itemsPerPage = 6
     return () => {
       cancelled = true;
     };
-  }, [websiteName]);
+  }, [websiteName, currentPage]) // ✅ important
 
   const toggle = (id) => setExpanded((prev) => (prev === id ? null : id))
 
@@ -168,9 +179,6 @@ const itemsPerPage = 6
           <h2 className="mobile-title">Available Mobiles</h2>
           <p className="mobile-sub">Loading...</p>
         </div>
-        <div className="mobile-cards" style={{ textAlign: 'center', padding: '2rem' }}>
-          Loading mobiles...
-        </div>
       </div>
     )
   }
@@ -180,7 +188,7 @@ const itemsPerPage = 6
       <div className="mobile-list-wrapper">
         <div className="mobile-list-header">
           <h2 className="mobile-title">Available Mobiles</h2>
-          <p className="mobile-sub" style={{ color: 'var(--error, #c00)' }}>{error}</p>
+          <p className="mobile-sub" style={{ color: '#c00' }}>{error}</p>
         </div>
       </div>
     )
@@ -194,10 +202,8 @@ const itemsPerPage = 6
 
       <div className="mobile-cards">
         {phones.length === 0 ? (
-          <div style={{ gridColumn: '1 / -1', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px', padding: '2rem' }}>
-            <p style={{ margin: 0, color: '#6b7280' }}>No mobiles found.</p>
-          </div>
-        ) : currentPhones.map((phone) => (
+          <p>No mobiles found.</p>
+        ) : phones.map((phone) => (
           <article key={phone.id} className={`mobile-card ${expanded === phone.id ? 'expanded' : ''}`}>
             <div className="mobile-card-main">
               <div className="mobile-image">
@@ -207,6 +213,7 @@ const itemsPerPage = 6
                   alt={phone.name}
                 />
               </div>
+
               <div className="mobile-info">
                 <div className="info-top">
                   <div>
@@ -214,29 +221,22 @@ const itemsPerPage = 6
                     <div className="phone-health">{phone.color}</div>
                     <div className="phone-other">{phone.other}</div>
                   </div>
-                  <div className="badges">
-                    <span className="badge">{phone.condition}</span>
-                  </div>
+                  <span className="badge">{phone.condition}</span>
                 </div>
 
                 <div className="info-actions">
-                  <div className="price-block">
-                    <a
-                      className="view-price-btn"
-                      href={`https://wa.me/${mobileNumber}?text=${encodeURIComponent(
-                        `Hi, I want the price for ${phone.name}`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      View price
-                    </a>
-                  </div>
-
-                  <button
-                    className={`expand-btn ${expanded === phone.id ? 'open' : ''}`}
-                    onClick={() => toggle(phone.id)}
+                  <a
+                    className="view-price-btn"
+                    href={`https://wa.me/${mobileNumber}?text=${encodeURIComponent(
+                      `Hi, I want the price for ${phone.name}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
+                    View price
+                  </a>
+
+                  <button onClick={() => toggle(phone.id)}>
                     ▼
                   </button>
                 </div>
@@ -244,50 +244,32 @@ const itemsPerPage = 6
             </div>
 
             <div className="mobile-card-details">
-              <div className="details-grid">
-                <div><strong>Warranty:</strong> {phone.warranty}</div>
-                <div><strong>Battery Health:</strong> {phone.batteryHealth}</div>
-              </div>
-
-              <div className="details-actions">
-                <a
-                  className="contact-btn"
-                  href={`https://wa.me/${mobileNumber}?text=${encodeURIComponent(
-                    `Hi, I'm interested in ${phone.name}`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Contact Seller
-                </a>
-
-                <button className="close-details" onClick={() => setExpanded(null)}>
-                  Close
-                </button>
-              </div>
+              <div><strong>Warranty:</strong> {phone.warranty}</div>
+              <div><strong>Battery Health:</strong> {phone.batteryHealth}</div>
             </div>
           </article>
         ))}
       </div>
-      {phones.length > 6 && (
-  <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
-    <ReactPaginate
-      previousLabel={"←"}
-      nextLabel={"→"}
-      breakLabel={"..."}
-      pageCount={pageCount}
-      marginPagesDisplayed={1}
-      pageRangeDisplayed={2}
-      onPageChange={handlePageClick}
-      containerClassName={"pagination"}
-      activeClassName={"active"}
-      pageClassName={"page-item"}
-      previousClassName={"page-item"}
-      nextClassName={"page-item"}
-      breakClassName={"page-item"}
-    />
-  </div>
-)}
+
+      {/* Pagination */}
+      {pageCount > 1 && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '20px' , flexDirection: 'row'}}>
+          <ReactPaginate
+            previousLabel={"←"}
+            nextLabel={"→"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            forcePage={currentPage}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+            pageClassName={"page-item"}
+            previousClassName={"page-item"}
+            nextClassName={"page-item"}
+            breakClassName={"page-item"}
+          />
+        </div>
+      )}
     </div>
   )
 }
