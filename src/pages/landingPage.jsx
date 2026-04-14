@@ -333,11 +333,11 @@ const BusinessDirectory = () => {
             ) : (
                 <>
                     <motion.div
+                        key={`grid-${businesses.length}`}
                         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"
                         variants={staggerContainer}
                         initial="hidden"
-                        whileInView="visible"
-                        viewport={{ once: true, margin: "-30px" }}
+                        animate="visible"
                     >
                         {businesses.map((biz, i) => (
                             <motion.div
@@ -617,8 +617,11 @@ const LandingPage = () => {
                 </div>
 
                 {/* Bottom gradient fade */}
-                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent z-20" />
+                <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-gray-50 to-transparent z-20" />
             </section>
+
+            {/* ══════════════════  BUSINESS DIRECTORY  ══════════════════ */}
+            <BusinessDirectory />
 
             {/* ══════════════════  INTRODUCTION  ══════════════════ */}
             <Section id="introduction">
@@ -739,8 +742,7 @@ const LandingPage = () => {
                 </motion.div>
             </Section>
 
-            {/* ══════════════════  BUSINESS DIRECTORY  ══════════════════ */}
-            <BusinessDirectory />
+
 
             {/* ══════════════════  APP SCREENSHOTS SHOWCASE  ══════════════════ */}
             <section id="app-showcase" className="relative py-16 sm:py-24 overflow-hidden bg-[#0d1117] scroll-mt-24">
