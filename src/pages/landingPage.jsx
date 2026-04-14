@@ -213,12 +213,14 @@ const BusinessDirectory = () => {
     const [loading, setLoading] = useState(true);
     const [totalCount, setTotalCount] = useState(0);
     const [states, setStates] = useState([]);
+    const [cities, setCities] = useState([]);
     const [activeCategory, setActiveCategory] = useState("All");
     const [activeState, setActiveState] = useState("");
+    const [activeCity, setActiveCity] = useState("");
     const [skip, setSkip] = useState(0);
     const take = 12;
 
-    const fetchDirectory = async (categoryFilter, stateFilter, skipVal) => {
+    const fetchDirectory = async (categoryFilter, stateFilter, cityFilter, skipVal) => {
         try {
             setLoading(true);
             const params = new URLSearchParams();
@@ -226,6 +228,7 @@ const BusinessDirectory = () => {
             params.set("take", take);
             if (categoryFilter && categoryFilter !== "All") params.set("category", categoryFilter);
             if (stateFilter) params.set("state", stateFilter);
+            if (cityFilter) params.set("city", cityFilter);
 
             const res = await api.get(`/User/GetAllBusinessDirectory?${params.toString()}`);
             const data = res?.data;
@@ -239,6 +242,9 @@ const BusinessDirectory = () => {
             if (data?.states?.length > 0 && states.length === 0) {
                 setStates(data.states);
             }
+            if (data?.cities !== undefined) {
+                setCities(data.cities);
+            }
         } catch (err) {
             console.error("Directory fetch error:", err);
         } finally {
@@ -248,16 +254,16 @@ const BusinessDirectory = () => {
 
     useEffect(() => {
         setSkip(0);
-        fetchDirectory(activeCategory, activeState, 0);
-    }, [activeCategory, activeState]);
+        fetchDirectory(activeCategory, activeState, activeCity, 0);
+    }, [activeCategory, activeState, activeCity]);
 
     const handleLoadMore = () => {
         const newSkip = skip + take;
         setSkip(newSkip);
-        fetchDirectory(activeCategory, activeState, newSkip);
+        fetchDirectory(activeCategory, activeState, activeCity, newSkip);
     };
 
-    const categoryFilters = ["All", "Mobile", "Vehicle", "Electronics", "Watch", "Gold"];
+    const categoryFilters = ["All", "Mobile", "Vehicle", "Electronics", "Watch"];
 
     return (
         <Section id="business-directory" className="bg-gray-50">
@@ -295,18 +301,35 @@ const BusinessDirectory = () => {
                     ))}
                 </div>
 
-                {/* State dropdown */}
+                {/* State and City dropdowns */}
                 {states.length > 0 && (
-                    <select
-                        className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]"
-                        value={activeState}
-                        onChange={(e) => setActiveState(e.target.value)}
-                    >
-                        <option value="">All States</option>
-                        {states.map((s) => (
-                            <option key={s} value={s}>{s}</option>
-                        ))}
-                    </select>
+                    <div className="flex gap-2">
+                        <select
+                            className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]"
+                            value={activeState}
+                            onChange={(e) => {
+                                setActiveState(e.target.value);
+                                setActiveCity("");
+                            }}
+                        >
+                            <option value="">All States</option>
+                            {states.map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                            ))}
+                        </select>
+                        {(cities.length > 0 || activeState) && (
+                            <select
+                                className="px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]"
+                                value={activeCity}
+                                onChange={(e) => setActiveCity(e.target.value)}
+                            >
+                                <option value="">All Cities</option>
+                                {cities.map((c) => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                        )}
+                    </div>
                 )}
             </motion.div>
 
@@ -376,6 +399,11 @@ const BusinessDirectory = () => {
                                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-medium">
                                             {CATEGORY_ICON_MAP[biz.categoryName] || "📦"} {biz.categoryName || "General"}
                                         </span>
+                                        {biz.city && (
+                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                                                📍 {biz.city}
+                                            </span>
+                                        )}
                                         {biz.state && (
                                             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
                                                 📍 {biz.state}
@@ -540,7 +568,7 @@ const LandingPage = () => {
                             <div className="mt-8 flex flex-col sm:flex-row gap-4">
                                 {/* Apple App Store */}
                                 <motion.a
-                                    href="https://apps.apple.com/search?term=Track%20Inventory"
+                                    href="https://apps.apple.com/app/id6761967123"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group inline-flex items-center gap-3 px-6 py-3.5 rounded-xl bg-white text-black font-semibold shadow-lg hover:shadow-xl transition-all duration-200 border border-white/20"
