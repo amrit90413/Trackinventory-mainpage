@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
-import logo from '../assets/logo-new.jpg';
+import logo from '../assets/logo-icon.png';
 import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 
-const gradientClass = 'bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500';
+const gradientClass = 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400';
 const hoverGradient = 'hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600';
 
 const navItems = [

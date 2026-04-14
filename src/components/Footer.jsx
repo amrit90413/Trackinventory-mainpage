@@ -59,9 +59,9 @@ const Footer = () => {
   return (
     <footer className="bg-gray-900 text-white relative overflow-hidden">
       <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/20 to-pink-500/20"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20"></div>
         <motion.div
-          className="absolute top-20 right-20 w-32 h-32 bg-purple-500 rounded-full blur-3xl"
+          className="absolute top-20 right-20 w-32 h-32 bg-blue-500 rounded-full blur-3xl"
           animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.6, 0.3]
@@ -73,7 +73,7 @@ const Footer = () => {
           }}
         />
         <motion.div
-          className="absolute bottom-20 left-20 w-24 h-24 bg-pink-500 rounded-full blur-2xl"
+          className="absolute bottom-20 left-20 w-24 h-24 bg-cyan-500 rounded-full blur-2xl"
           animate={{
             scale: [1, 1.3, 1],
             opacity: [0.3, 0.7, 0.3]
@@ -116,7 +116,7 @@ const Footer = () => {
                       onClick={() => handleNavClick(link.id)}
                     >
                       <motion.span
-                        className="w-1 h-1 bg-purple-500 rounded-full"
+                        className="w-1 h-1 bg-blue-500 rounded-full"
                         whileHover={{ scale: 1.5 }}
                         transition={{ type: "spring", stiffness: 300 }}
                       />
@@ -142,7 +142,7 @@ const Footer = () => {
                       }}
                     >
                       <motion.span
-                        className="w-1.5 h-1.5 bg-pink-500 rounded-full"
+                        className="w-1.5 h-1.5 bg-cyan-500 rounded-full"
                         whileHover={{ scale: 1.5 }}
                         transition={{ type: "spring", stiffness: 300 }}
                       />
@@ -202,7 +202,7 @@ const Footer = () => {
               <path d="M2.25 6.75A2.25 2.25 0 014.5 4.5h15a2.25 2.25 0 012.25 2.25v10.5a2.25 2.25 0 01-2.25 2.25h-15A2.25 2.25 0 012.25 17.25V6.75zm1.72-.53l7.28 5.33 7.28-5.33H3.97z" />
             </svg>
             <motion.span
-              className="text-sm sm:text-base font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent"
+              className="text-sm sm:text-base font-bold bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
