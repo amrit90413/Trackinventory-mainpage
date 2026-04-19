@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-icon.png';
 import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
+import SearchBar from './SearchBar';
 
 const gradientClass = 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400';
 const hoverGradient = 'hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600';
@@ -177,7 +178,7 @@ const Header = () => {
       transition={{ duration: 0.5 }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:pt-4 sm:pb-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-16 gap-4">
           <motion.h1
             className={`text-3xl font-bold bg-clip-text text-transparent cursor-pointer ${gradientClass}`}
             whileHover={{ scale: 1.05 }}
@@ -190,6 +191,9 @@ const Header = () => {
               className="h-10 w-auto sm:h-12 md:h-14 lg:h-20 object-contain"
             />
           </motion.h1>
+          <SearchBar onSearch={(searchData) => {
+            console.log('Search:', searchData);
+          }} />
           <nav className="hidden md:flex items-center space-x-6">
             {/* Trial gift icon with hover / focus tooltip */}
             {showTrialBanner && trialMessage && (
