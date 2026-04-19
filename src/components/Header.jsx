@@ -191,9 +191,8 @@ const Header = () => {
               className="h-10 w-auto sm:h-12 md:h-14 lg:h-20 object-contain"
             />
           </motion.h1>
-          <SearchBar onSearch={(searchData) => {
-            console.log('Search:', searchData);
-          }} />
+          {/* Search Bar (desktop + mobile variants handled inside) */}
+          <SearchBar />
           <nav className="hidden md:flex items-center space-x-6">
             {/* Trial gift icon with hover / focus tooltip */}
             {showTrialBanner && trialMessage && (

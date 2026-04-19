@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react"
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import api from "../composables/instance";
+import { useSearch } from "../context/SearchContext";
 
 /* ───────────────────── static data ───────────────────── */
 const SCREENSHOTS = [
@@ -228,13 +229,16 @@ const BusinessDirectory = () => {
     const [activeStatesFromApi, setActiveStatesFromApi] = useState([]);
     const [cities, setCities] = useState([]);
     const [activeCategory, setActiveCategory] = useState("All");
-    const [activeState, setActiveState] = useState("");
-    const [activeCity, setActiveCity] = useState("");
+    const { 
+        searchQuery, setSearchQuery, 
+        activeState, setActiveState, 
+        activeCity, setActiveCity 
+    } = useSearch();
     const [skip, setSkip] = useState(0);
     const take = 12;
 
     // Product search state
-    const [searchQuery, setSearchQuery] = useState("");
+    // searchQuery is now provided by useSearch()
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [productResults, setProductResults] = useState(null); // null = not in search mode
     const [searchLoading, setSearchLoading] = useState(false);
@@ -323,40 +327,6 @@ const BusinessDirectory = () => {
                 subtitle="Discover trusted shopkeepers managing their inventory with our platform. Click to view their products."
             />
 
-            {/* Search Bar */}
-            <motion.div
-                className="mb-4"
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4 }}
-            >
-                <div className="relative max-w-2xl mx-auto">
-                    <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-                        </svg>
-                    </div>
-                    <input
-                        type="text"
-                        placeholder="Search by shop name, owner, city, category..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-12 pr-10 py-3 rounded-2xl bg-white border border-gray-200 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
-                    />
-                    {searchQuery && (
-                        <button
-                            onClick={() => setSearchQuery("")}
-                            className="absolute inset-y-0 right-3 flex items-center text-gray-400 hover:text-gray-600"
-                        >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    )}
-                </div>
-            </motion.div>
-
             {/* Filter Bar */}
             <motion.div
                 className="flex flex-col gap-3 mb-8"
@@ -385,8 +355,8 @@ const BusinessDirectory = () => {
                     ))}
                 </div>
 
-                {/* State and City dropdowns */}
-                <div className="flex flex-col sm:flex-row gap-2 justify-center items-center">
+                {/* State and City dropdowns - Only visible on Desktop as they are moved to search bar on mobile */}
+                <div className="hidden md:flex flex-col sm:flex-row gap-2 justify-center items-center">
                     <select
                         className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white border border-gray-200 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[180px]"
                         value={activeState}
