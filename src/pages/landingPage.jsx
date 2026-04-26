@@ -60,7 +60,7 @@ const FEATURES = [
 ];
 
 const HOW_IT_WORKS = [
-    { title: "Create Account", desc: "Sign up in seconds with your email. It's free to start.", icon: "✨" },
+    { title: "Create Account", desc: "Join us in seconds with your email. It's free to start.", icon: "✨" },
     { title: "Set Up Your Business", desc: "Enter business details — name, type, location — and you are ready.", icon: "🏪" },
     { title: "Start Tracking", desc: "Add products, record sales & purchases, scan barcodes. Manage everything.", icon: "📦" },
     { title: "Grow Your Business", desc: "Use analytics, generate QR, share inventory & manage leads.", icon: "🚀" },

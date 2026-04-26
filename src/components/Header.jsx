@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import logo from '../assets/logo-icon.png';
-import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment } from '@mui/icons-material';
+import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment, Dashboard } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 import SearchBar from './SearchBar';
 
@@ -13,7 +13,7 @@ const navItems = [
   { id: 'introduction', label: 'Introduction' },
   { id: 'how-it-works', label: 'How It Works' },
   { id: 'faqs', label: 'FAQs' },
-  { id: 'sign-up', label: 'Sign-up' }
+  { id: 'sign-up', label: 'Join Us' }
 ];
 
 const Header = () => {
@@ -114,7 +114,9 @@ const Header = () => {
   };
 
   const handleUserMenuClick = (action) => {
-    if (action === 'profile') {
+    if (action === 'dashboard') {
+      navigate('/dashboard');
+    } else if (action === 'profile') {
       navigate('/profile');
     } else if (action === 'signup') {
       navigate('/sign-up');
@@ -253,11 +255,22 @@ const Header = () => {
               <motion
                 onClick={() => {
                   setIsMenuOpen(false);
-                  navigate(`/${websiteName}`);
+                  navigate(`/${websiteName}?category=Mobile`);
                 }}
                 className="group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300"
               >
                 <span>Mobiles</span>
+              </motion>
+            )}
+            {isLoggedIn && (
+              <motion
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  navigate(`/${websiteName}?category=Vehicle`);
+                }}
+                className="group cursor-pointer relative text-base px-3 py-2 text-gray-700 hover:text-pink-600 font-medium transition-all duration-300"
+              >
+                <span>Vehicles</span>
               </motion>
             )}
             {isLoggedIn && (
@@ -281,6 +294,13 @@ const Header = () => {
                         exit={{ opacity: 0, y: -10 }}
                         transition={{ duration: 0.2 }}
                       >
+                        <button
+                          onClick={() => handleUserMenuClick('dashboard')}
+                          className="w-full text-left px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 flex items-center space-x-2 rounded-md font-semibold"
+                        >
+                          <Dashboard sx={{ fontSize: 20 }} />
+                          <span>My Dashboard</span>
+                        </button>
                         <button
                           onClick={() => handleUserMenuClick('profile')}
                           className="w-full text-left px-4 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-md"
@@ -364,15 +384,32 @@ const Header = () => {
                 <motion.a
                   onClick={() => {
                     setIsMenuOpen(false);
-                    navigate(`/${websiteName}`);
+                    navigate(`/${websiteName}?category=Mobile`);
                   }}
                   className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-medium cursor-pointer"
                   whileHover={{ x: 10 }}
                 >
                   Mobiles
                 </motion.a>
+                <motion.a
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    navigate(`/${websiteName}?category=Vehicle`);
+                  }}
+                  className="block text-base px-3 py-2 rounded-lg hover:bg-pink-50 text-gray-700 hover:text-pink-600 font-medium cursor-pointer"
+                  whileHover={{ x: 10 }}
+                >
+                  Vehicles
+                </motion.a>
                 {isLoggedIn && (
                   <div className="pt-4 border-t border-gray-200/50">
+                    <button
+                      onClick={() => handleUserMenuClick('dashboard')}
+                      className="w-full text-left px-3 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-all duration-200 flex items-center space-x-2 rounded-lg font-semibold"
+                    >
+                      <Dashboard sx={{ fontSize: 20 }} />
+                      <span>My Dashboard</span>
+                    </button>
                     <button
                       onClick={() => handleUserMenuClick('profile')}
                       className="w-full text-left px-3 py-3 text-gray-700 hover:bg-pink-50 hover:text-pink-600 transition-all duration-200 flex items-center space-x-2 rounded-lg"

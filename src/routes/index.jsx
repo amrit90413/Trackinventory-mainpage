@@ -13,7 +13,8 @@ import Profile from "../pages/profile";
 import ChangePassword from "../pages/changePassword";
 import PaymentHistory from "../pages/paymentHistory";
 import MobileList from "../components/MobileList";
-import DeleteAccount from "../pages/deleteAccount"; 
+import DeleteAccount from "../pages/deleteAccount";
+import Dashboard from "../pages/dashboard";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -52,7 +53,15 @@ export const routes = createBrowserRouter([
     element:<Subscription/>
   },
   {
-   path:"/profile", 
+    path: "/dashboard",
+    element: (
+      <PrivateRoute>
+        <Dashboard />
+      </PrivateRoute>
+    ),
+  },
+  {
+   path:"/profile",
    element:<Profile/>
   },
   {

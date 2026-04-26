@@ -1,395 +1,202 @@
-import { useState } from "react";
-import {
-  TextField,
-  Button,
-  CircularProgress,
-  Card,
-  CardContent,
-  Typography,
-  Box,
-  Alert,
-  IconButton,
-  InputAdornment
-} from "@mui/material";
-import {
-  Lock,
-  LockOpen,
-  Visibility,
-  VisibilityOff,
-  ArrowBack
-} from "@mui/icons-material";
-import { useNavigate } from "react-router-dom";
-import api from "../composables/instance";
-import { useAuth } from "../context/auth/useAuth";
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { CircularProgress } from '@mui/material';
+import { Lock, LockOpen, Visibility, VisibilityOff, CheckCircle, ArrowBack } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import api from '../composables/instance';
+import { useAuth } from '../context/auth/useAuth';
+
+const inputCls =
+  'w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all pr-12';
+
+const PasswordField = ({ label, icon, value, onChange, show, onToggle, error }) => (
+  <div>
+    <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1.5">
+      {label}
+    </label>
+    <div className="relative">
+      <span className="absolute inset-y-0 left-3.5 flex items-center text-slate-400">
+        {icon}
+      </span>
+      <input
+        type={show ? 'text' : 'password'}
+        placeholder="••••••••"
+        value={value}
+        onChange={onChange}
+        className={`${inputCls} pl-10`}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600"
+      >
+        {show ? <VisibilityOff sx={{ fontSize: 18 }} /> : <Visibility sx={{ fontSize: 18 }} />}
+      </button>
+    </div>
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+  </div>
+);
 
 export default function ChangePassword() {
   const navigate = useNavigate();
   const { token } = useAuth();
 
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-  });
-
-  const [showPasswords, setShowPasswords] = useState({
-    old: false,
-    new: false,
-    confirm: false,
-  });
-
-  const [errors, setErrors] = useState({});
   const [success, setSuccess] = useState(false);
+  const [formData, setFormData] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
+  const [show, setShow] = useState({ old: false, new: false, confirm: false });
+  const [errors, setErrors] = useState({});
 
-  const validateForm = () => {
-    const newErrors = {};
+  const set = (field) => (e) => {
+    setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
 
-    if (!formData.oldPassword) {
-      newErrors.oldPassword = "Old password is required";
-    }
+  const toggleShow = (field) => () => setShow((prev) => ({ ...prev, [field]: !prev[field] }));
 
-    if (!formData.newPassword) {
-      newErrors.newPassword = "New password is required";
-    } else if (formData.newPassword.length < 6) {
-      newErrors.newPassword = "Password must be at least 6 characters";
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm your new password";
-    } else if (formData.newPassword !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (formData.oldPassword === formData.newPassword) {
-      newErrors.newPassword = "New password must be different from old password";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validate = () => {
+    const e = {};
+    if (!formData.oldPassword) e.oldPassword = 'Current password is required';
+    if (!formData.newPassword) e.newPassword = 'New password is required';
+    else if (formData.newPassword.length < 6) e.newPassword = 'Must be at least 6 characters';
+    if (!formData.confirmPassword) e.confirmPassword = 'Please confirm your password';
+    else if (formData.newPassword !== formData.confirmPassword) e.confirmPassword = 'Passwords do not match';
+    if (formData.oldPassword && formData.oldPassword === formData.newPassword)
+      e.newPassword = 'Must differ from your current password';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) return;
-
+    if (!validate()) return;
     setLoading(true);
     setErrors({});
-
     try {
-      await api.post(
-        "/User/ChangePassword",
-        {
-          oldPassword: formData.oldPassword,
-          newPassword: formData.newPassword,
-        },
+      await api.post('/User/ChangePassword',
+        { oldPassword: formData.oldPassword, newPassword: formData.newPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setSuccess(true);
-      setFormData({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-
-      // Redirect to profile after 2 seconds
-      setTimeout(() => {
-        navigate("/profile");
-      }, 2000);
-
+      setTimeout(() => navigate('/profile'), 2500);
     } catch (error) {
-      setErrors({
-        submit: error.response?.data?.message || "Failed to change password. Please try again."
-      });
+      setErrors({ submit: error.response?.data?.message || 'Failed to change password. Please try again.' });
     } finally {
       setLoading(false);
     }
   };
 
-  const handleInputChange = (field) => (e) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: e.target.value
-    }));
-    // Clear error when user starts typing
-    if (errors[field]) {
-      setErrors(prev => ({
-        ...prev,
-        [field]: ""
-      }));
-    }
-  };
-
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
-
-  if (success) {
-    return (
-      <Box
-        sx={{
-          minHeight: '100vh',
-          backgroundColor: '#f9fafb',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          px: 2,
-        }}
-      >
-        <Card
-          sx={{
-            maxWidth: 400,
-            width: '100%',
-            background: 'white',
-            borderRadius: 4,
-            boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-            border: '1px solid #e5e7eb',
-          }}
-        >
-          <CardContent sx={{ p: 4, textAlign: 'center' }}>
-            <Box sx={{ color: 'green', mb: 2 }}>
-              <Lock sx={{ fontSize: 48 }} />
-            </Box>
-            <Typography variant="h5" sx={{ mb: 2, color: '#333' }}>
-              Password Changed Successfully!
-            </Typography>
-            <Typography variant="body1" sx={{ color: '#666', mb: 3 }}>
-              Your password has been updated. You will be redirected to your profile page shortly.
-            </Typography>
-            <Button
-              variant="contained"
-              onClick={() => navigate("/profile")}
-              sx={{
-                background: 'linear-gradient(45deg, #ec4899, #6366f1)',
-                color: 'white',
-                px: 4,
-                py: 1.5,
-                borderRadius: 3,
-                textTransform: 'none',
-                boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
-                '&:hover': {
-                  background: 'linear-gradient(45deg, #db2777, #4f46e5)',
-                  boxShadow: '0 6px 20px rgba(236, 72, 153, 0.6)',
-                  transform: 'translateY(-2px)',
-                },
-                transition: 'all 0.3s ease',
-              }}
-            >
-              Go to Profile
-            </Button>
-          </CardContent>
-        </Card>
-      </Box>
-    );
-  }
-
   return (
-    <Box
-      sx={{
-        minHeight: '100vh',
-        backgroundColor: '#f9fafb',
-        py: 4,
-        px: 2,
-      }}
-    >
-      <Box sx={{ maxWidth: 500, mx: 'auto' }}>
-        <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'center',mt: 5 }}>
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{
-              color: '#667eea',
-              mb: 2,
-              '&:hover': { backgroundColor: 'rgba(255,255,255,0.1)' }
-            }}
-          >
-            <ArrowBack />
-          </IconButton>
-          <Typography
-            variant="h3"
-            sx={{
-              fontWeight: 700,
-              textAlign: 'center',
-              mb: 4,
-              background: 'linear-gradient(45deg, #ec4899, #6366f1)',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-            }}
-          >
-            Change Password
-          </Typography>
-        </Box>
-
-        {/* Form Card */}
-        <Card
-          sx={{
-            background: 'white',
-            borderRadius: 4,
-            boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
-            border: '1px solid #e5e7eb',
-          }}
+    <div className="min-h-screen pt-24 pb-16 px-4 sm:px-6 flex items-start justify-center"
+      style={{ background: 'linear-gradient(135deg,#f0f9ff 0%,#f8fafc 100%)' }}>
+      <div className="w-full max-w-md">
+        {/* Back */}
+        <button
+          onClick={() => navigate('/profile')}
+          className="flex items-center gap-1.5 text-slate-500 hover:text-slate-700 text-sm font-medium mb-6 transition-colors"
         >
-          <CardContent sx={{ p: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-              <Lock sx={{ fontSize: 30, color: '#667eea', mr: 2 }} />
-              <Typography variant="h6" sx={{ color: '#333' }}>
-                Secure Password
-              </Typography>
-            </Box>
+          <ArrowBack sx={{ fontSize: 16 }} /> Back to Profile
+        </button>
 
-            {errors.submit && (
-              <Alert severity="error" sx={{ mb: 3 }}>
-                {errors.submit}
-              </Alert>
-            )}
-
-            <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {/* Old Password */}
-              <TextField
-                fullWidth
-                label="Current Password"
-                type={showPasswords.old ? "text" : "password"}
-                value={formData.oldPassword}
-                onChange={handleInputChange('oldPassword')}
-                error={!!errors.oldPassword}
-                helperText={errors.oldPassword}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockOpen sx={{ color: '#666' }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => togglePasswordVisibility('old')}
-                        edge="end"
-                      >
-                        {showPasswords.old ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255,255,255,0.8)',
-                  },
-                }}
-              />
-
-              {/* New Password */}
-              <TextField
-                fullWidth
-                label="New Password"
-                type={showPasswords.new ? "text" : "password"}
-                value={formData.newPassword}
-                onChange={handleInputChange('newPassword')}
-                error={!!errors.newPassword}
-                helperText={errors.newPassword}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock sx={{ color: '#666' }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => togglePasswordVisibility('new')}
-                        edge="end"
-                      >
-                        {showPasswords.new ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255,255,255,0.8)',
-                  },
-                }}
-              />
-
-              {/* Confirm Password */}
-              <TextField
-                fullWidth
-                label="Confirm New Password"
-                type={showPasswords.confirm ? "text" : "password"}
-                value={formData.confirmPassword}
-                onChange={handleInputChange('confirmPassword')}
-                error={!!errors.confirmPassword}
-                helperText={errors.confirmPassword}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <Lock sx={{ color: '#666' }} />
-                    </InputAdornment>
-                  ),
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        onClick={() => togglePasswordVisibility('confirm')}
-                        edge="end"
-                      >
-                        {showPasswords.confirm ? <VisibilityOff /> : <Visibility />}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    backgroundColor: 'rgba(255,255,255,0.8)',
-                  },
-                }}
-              />
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                variant="contained"
-                disabled={loading}
-                sx={{
-                  mt: 2,
-                  background: 'linear-gradient(45deg, #ec4899, #6366f1)',
-                  color: 'white',
-                  py: 1.5,
-                  borderRadius: 3,
-                  fontWeight: 600,
-                  textTransform: 'none',
-                  boxShadow: '0 4px 15px rgba(236, 72, 153, 0.4)',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #db2777, #4f46e5)',
-                    boxShadow: '0 6px 20px rgba(236, 72, 153, 0.6)',
-                    transform: 'translateY(-2px)',
-                  },
-                  '&:disabled': {
-                    background: '#ccc',
-                    color: '#666',
-                  },
-                  transition: 'all 0.3s ease',
-                }}
+        <AnimatePresence mode="wait">
+          {success ? (
+            <motion.div
+              key="success"
+              className="bg-white rounded-2xl border border-slate-100 shadow-sm p-10 text-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                <CheckCircle sx={{ color: '#22c55e', fontSize: 36 }} />
+              </div>
+              <h2 className="text-xl font-bold text-slate-900 mb-2">Password Changed!</h2>
+              <p className="text-slate-500 text-sm mb-6">
+                Your password has been updated. Redirecting to your profile…
+              </p>
+              <motion.button
+                onClick={() => navigate('/profile')}
+                className="px-6 py-2.5 rounded-xl text-white text-sm font-semibold"
+                style={{ background: 'linear-gradient(90deg,#2563eb,#06b6d4)' }}
+                whileHover={{ scale: 1.02 }}
               >
-                {loading ? (
-                  <>
-                    <CircularProgress size={20} sx={{ color: 'white', mr: 1 }} />
-                    Updating...
-                  </>
-                ) : (
-                  'Update Password'
+                Go to Profile
+              </motion.button>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-slate-900">Change Password</h1>
+                <p className="text-slate-500 text-sm mt-1">Keep your account secure with a strong password</p>
+              </div>
+
+              <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
+                <div className="flex items-center gap-3 mb-5 pb-5 border-b border-slate-100">
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center"
+                    style={{ background: 'linear-gradient(135deg,#2563eb,#06b6d4)' }}>
+                    <Lock sx={{ color: 'white', fontSize: 18 }} />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-800">Secure Password Update</p>
+                    <p className="text-xs text-slate-400">You'll stay signed in after changing</p>
+                  </div>
+                </div>
+
+                {errors.submit && (
+                  <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                    {errors.submit}
+                  </div>
                 )}
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      </Box>
-    </Box>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <PasswordField
+                    label="Current Password"
+                    icon={<LockOpen sx={{ fontSize: 16 }} />}
+                    value={formData.oldPassword}
+                    onChange={set('oldPassword')}
+                    show={show.old}
+                    onToggle={toggleShow('old')}
+                    error={errors.oldPassword}
+                  />
+                  <PasswordField
+                    label="New Password"
+                    icon={<Lock sx={{ fontSize: 16 }} />}
+                    value={formData.newPassword}
+                    onChange={set('newPassword')}
+                    show={show.new}
+                    onToggle={toggleShow('new')}
+                    error={errors.newPassword}
+                  />
+                  <PasswordField
+                    label="Confirm New Password"
+                    icon={<Lock sx={{ fontSize: 16 }} />}
+                    value={formData.confirmPassword}
+                    onChange={set('confirm')}
+                    show={show.confirm}
+                    onToggle={toggleShow('confirm')}
+                    error={errors.confirmPassword}
+                  />
+
+                  <motion.button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-3.5 rounded-xl text-white font-semibold text-sm disabled:opacity-70 flex items-center justify-center gap-2 mt-2"
+                    style={{ background: 'linear-gradient(90deg,#2563eb,#06b6d4)' }}
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? <CircularProgress size={20} sx={{ color: 'white' }} /> : 'Update Password'}
+                  </motion.button>
+                </form>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
