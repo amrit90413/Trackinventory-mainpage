@@ -15,6 +15,7 @@ import PaymentHistory from "../pages/paymentHistory";
 import MobileList from "../components/MobileList";
 import DeleteAccount from "../pages/deleteAccount";
 import Dashboard from "../pages/dashboard";
+import ProductDetailPage from "../pages/ProductDetailPage";
 export const routes = createBrowserRouter([
   {
     path: "/",
@@ -95,6 +96,10 @@ export const routes = createBrowserRouter([
         <MobileList />
       </PrivateRoute>
     ),
+  },
+  {
+    path: "/:websiteName/product/:productId",
+    element: <ProductDetailPage />,
   },
   {
     path: "/:websiteName",

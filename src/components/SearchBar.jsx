@@ -96,11 +96,15 @@ const SearchBar = () => {
     return out.slice(0, 8);
   })();
 
-  const handleNavigate = (websiteName) => {
-    if (!websiteName) return;
+  const handleNavigate = (item) => {
+    if (!item?.websiteName) return;
     setShowDropdown(false);
     setMobileOpen(false);
-    navigate(`/${websiteName}`);
+    if (item.productId) {
+      navigate(`/${item.websiteName}/product/${item.productId}`, { state: { product: item } });
+    } else {
+      navigate(`/${item.websiteName}`);
+    }
   };
 
   const handleClear = () => {
@@ -138,7 +142,7 @@ const SearchBar = () => {
             {flatItems.map((item, i) => (
               <li key={item.productId || `${item.websiteName}-${i}`}>
                 <button
-                  onClick={() => handleNavigate(item.websiteName)}
+                  onClick={() => handleNavigate(item)}
                   className="w-full text-left px-3 py-2.5 hover:bg-blue-50 flex items-center gap-3 transition-colors"
                 >
                   <span className="text-xl shrink-0">{CATEGORY_ICON_MAP[item.category] || '📦'}</span>
