@@ -249,12 +249,21 @@ const FilterDrawer = ({ open, onClose, filterOptions, filters, onChange, sortBy,
         {options.map((opt) => {
           const cond = COND_MAP[opt];
           const isActive = filters[field] === opt;
+          const activeStyle = isActive
+            ? cond
+              ? { background: cond.bg, color: cond.color, border: `1px solid ${cond.color}` }
+              : {} // blue class handles it below
+            : {};
           return (
             <button key={opt} onClick={() => onChange(field, isActive ? '' : opt)}
               className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
-                isActive ? 'border-transparent' : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
+                isActive
+                  ? cond
+                    ? 'border-transparent'
+                    : 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
               }`}
-              style={isActive && cond ? { background: cond.bg, color: cond.color, border: `1px solid ${cond.color}` } : {}}>
+              style={activeStyle}>
               {cond ? cond.label : opt}
             </button>
           );
