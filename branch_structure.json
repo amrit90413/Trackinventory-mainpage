@@ -1,0 +1,36 @@
+{
+  "default_branch": "master",
+  "branches": [
+    "copilot/redesign-website-premium-sleek",
+    "copilot/stitch-ai-redesign-website",
+    "copilot/update-user-profile-page",
+    "main",
+    "master",
+    "merge-smart-zone",
+    "origin",
+    "testamrit",
+    "testmaster"
+  ],
+  "parent": {
+    "copilot/redesign-website-premium-sleek": "master",
+    "copilot/stitch-ai-redesign-website": "master",
+    "copilot/update-user-profile-page": "master",
+    "main": "master",
+    "master": null,
+    "merge-smart-zone": "master",
+    "origin": "master",
+    "testamrit": "master",
+    "testmaster": "master"
+  },
+  "order": [
+    "master",
+    "copilot/redesign-website-premium-sleek",
+    "copilot/stitch-ai-redesign-website",
+    "copilot/update-user-profile-page",
+    "main",
+    "merge-smart-zone",
+    "origin",
+    "testamrit",
+    "testmaster"
+  ]
+}
