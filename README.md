@@ -1,5 +1,7 @@
 # React + Vite
 
+For the frontend build and Docker deployment in Jenkins, see [Jenkins setup](docs/JENKINS.md).
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
