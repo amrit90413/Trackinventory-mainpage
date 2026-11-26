@@ -5,6 +5,7 @@ import logo from '../assets/logo-icon.png';
 import { AccountCircle, Menu, Close, Lock, Person, Logout, Payment, Dashboard } from '@mui/icons-material';
 import { useAuth } from '../context/auth/useAuth';
 import SearchBar from './SearchBar';
+import { useSearch } from '../context/SearchContext';
 
 const gradientClass = 'bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-400';
 const hoverGradient = 'hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600';
@@ -17,6 +18,7 @@ const navItems = [
 ];
 
 const Header = () => {
+  const { businessDirectoryEnabled } = useSearch();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -194,7 +196,7 @@ const Header = () => {
             />
           </motion.h1>
           {/* Search Bar (desktop + mobile variants handled inside) */}
-          <SearchBar />
+          {businessDirectoryEnabled && <SearchBar />}
           <nav className="hidden md:flex items-center space-x-6">
             {/* Trial gift icon with hover / focus tooltip */}
             {showTrialBanner && trialMessage && (

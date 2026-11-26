@@ -581,6 +581,7 @@ const BusinessDirectory = () => {
 
 /* ───────────────────── main component ───────────────────── */
 const LandingPage = () => {
+    const { businessDirectoryEnabled } = useSearch();
     const [activeFaq, setActiveFaq] = useState(null);
     const [activeScreenshot, setActiveScreenshot] = useState(0);
     const { scrollY } = useScroll();
@@ -615,7 +616,7 @@ const LandingPage = () => {
             const el = document.getElementById(scrollToId);
             if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
-    }, [location.state]);
+    }, [location.state, businessDirectoryEnabled]);
 
     /* Auto-rotate screenshots */
     useEffect(() => {
@@ -777,7 +778,7 @@ const LandingPage = () => {
             </section>
 
             {/* ══════════════════  BUSINESS DIRECTORY  ══════════════════ */}
-            <BusinessDirectory />
+            {businessDirectoryEnabled && <BusinessDirectory />}
 
             {/* ══════════════════  INTRODUCTION  ══════════════════ */}
             <Section id="introduction">
