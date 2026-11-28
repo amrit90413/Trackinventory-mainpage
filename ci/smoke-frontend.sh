@@ -24,5 +24,7 @@ docker exec "$smoke_container" sh -ec '
     wget -q -O /tmp/app.js "http://127.0.0.1$asset"
     test -s /tmp/app.js
     wget -q -O /tmp/route.html http://127.0.0.1/business-details
-    cmp /tmp/index.html /tmp/route.html
+    grep -q "3560978907394960" /tmp/index.html
+    grep -q "id=\"root\"" /tmp/route.html
+    if grep -q "3560978907394960" /tmp/route.html; then exit 1; fi
 '

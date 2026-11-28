@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, redirectDocument } from "react-router";
 import LandingPage from "../pages/landingPage";
 import TermsOfServices from "../pages/termsOfServices";
 import PrivacyPolicy from "../pages/privacyPolicy";
@@ -16,11 +16,7 @@ import MobileList from "../components/MobileList";
 import DeleteAccount from "../pages/deleteAccount";
 import Dashboard from "../pages/dashboard";
 import ProductDetailPage from "../pages/ProductDetailPage";
-export const routes = createBrowserRouter([
-  {
-    path: "/",
-    element: <LandingPage />,
-  },
+const appRoutes = [
   {
     path: "/sign-in",
     element: <SignIn />,
@@ -105,5 +101,11 @@ export const routes = createBrowserRouter([
     path: "/:websiteName",
     element: <MobileList />,
   }
-]);
+];
 
+// A document navigation unloads the marketing scripts before opening the app.
+const loadDocument = ({ request }) => redirectDocument(request.url);
+const onLandingPage = window.location.pathname === "/";
+export const routes = createBrowserRouter(onLandingPage
+  ? [{ path: "/", element: <LandingPage /> }, { path: "*", loader: loadDocument }]
+  : [{ path: "/", loader: loadDocument }, ...appRoutes]);
