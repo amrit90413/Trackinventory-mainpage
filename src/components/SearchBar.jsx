@@ -117,7 +117,7 @@ const SearchBar = () => {
     setShowDropdown(false);
     setMobileOpen(false);
     if (location.pathname !== '/') {
-      navigate('/', { state: { scrollToId: 'business-directory' } });
+      navigate('/?section=business-directory');
     } else {
       setTimeout(() => {
         document.getElementById('business-directory')?.scrollIntoView({ behavior: 'smooth' });

@@ -611,12 +611,12 @@ const LandingPage = () => {
     };
 
     useEffect(() => {
-        const scrollToId = location.state?.scrollToId;
+        const scrollToId = new URLSearchParams(location.search).get("section");
         if (scrollToId) {
             const el = document.getElementById(scrollToId);
             if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
-    }, [location.state, businessDirectoryEnabled]);
+    }, [location.search, businessDirectoryEnabled]);
 
     /* Auto-rotate screenshots */
     useEffect(() => {

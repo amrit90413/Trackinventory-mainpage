@@ -51,7 +51,7 @@ const Footer = () => {
     if (location.pathname === '/') {
       document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
     } else {
-      navigate('/', { state: { scrollToId: id } });
+      navigate('/?section=' + encodeURIComponent(id));
     }
     setIsMenuOpen(false);
   };
